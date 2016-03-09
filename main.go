@@ -6,12 +6,13 @@ import (
    "strings"
    "regexp"
    "github.com/mattn/go-shellwords"
-   "github.com/rapid7/godaplib"
-   "github.com/rapid7/godaplib/api"
-   "github.com/rapid7/godaplib/factory"
-   _ "github.com/rapid7/godaplib/input"
-   _ "github.com/rapid7/godaplib/output"
+   "github.com/rapid7/godap/api"
+   "github.com/rapid7/godap/factory"
+   _ "github.com/rapid7/godap/input"
+   _ "github.com/rapid7/godap/output"
 )
+
+const VERSION = "0.0.1"
 
 func main() {
    Console := log.New(os.Stderr, "", 0)
@@ -122,7 +123,7 @@ func usage(Console *log.Logger) {
 }
 
 func version(Console *log.Logger) {
-   Console.Printf("dap %s", dap.VERSION)
+   Console.Printf("dap %s", VERSION)
    os.Exit(1)
 }
 
