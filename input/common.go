@@ -1,8 +1,8 @@
 package input
 
 import (
-   "os"
    "fmt"
+   "os"
    "github.com/rapid7/godap/util"
 )
 
