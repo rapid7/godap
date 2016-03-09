@@ -1,7 +1,6 @@
 package output
 
 import (
-   "fmt"
    "os"
    "github.com/rapid7/godap/util"
 )
@@ -13,11 +12,9 @@ type FileDestination struct {
 func (filedest *FileDestination) Open(file_name string) error {
    filedest.Close()
    if (util.StringInSlice(file_name, []string{ "", "-", "stdin" })) {
-      fmt.Println("Opening stdout...")
       filedest.fd = os.Stdout   
    } else {
-      fmt.Printf("Opening %s...\n", file_name)
-      fd, err := os.Open(file_name)
+      fd, err := os.Create(file_name)
       if (err != nil) {
          return err
       }

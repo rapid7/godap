@@ -3,6 +3,7 @@ package output
 import (
    "strings"
    "regexp"
+   "bufio"
    "github.com/rapid7/godap/api"
    "github.com/rapid7/godap/factory"
    "github.com/rapid7/godap/util"
@@ -13,6 +14,7 @@ const FIELD_WILDCARD = "_"
 type OutputLines struct {
    delimiter string
    fields []string
+   writer *bufio.Writer
    FileDestination
 }
 
@@ -34,8 +36,8 @@ func (lines *OutputLines) WriteRecord(data map[string]interface{}) {
 
    if (len(out) < 1) { return }
 
-   lines.fd.WriteString(strings.Join(out, lines.delimiter))
-   lines.fd.WriteString("\n")
+   lines.writer.WriteString(strings.Join(out, lines.delimiter))
+   lines.writer.WriteString("\n")
    lines.fd.Sync()
 }
 
@@ -82,8 +84,9 @@ func init() {
       }
 
       err = outputLines.Open(file)
+      outputLines.writer = bufio.NewWriter(outputLines.fd)
       if (header && !util.StringInSlice(outputLines.delimiter, outputLines.fields)) {
-         outputLines.fd.WriteString(strings.Join(outputLines.fields, outputLines.delimiter) + "\n")
+         outputLines.writer.WriteString(strings.Join(outputLines.fields, outputLines.delimiter) + "\n")
          outputLines.fd.Sync()
       }
       return outputLines, nil
