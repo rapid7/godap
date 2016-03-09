@@ -1,7 +1,6 @@
 package input
 
 import (
-   "fmt"
    "os"
    "github.com/rapid7/godap/util"
 )
@@ -12,10 +11,8 @@ type FileSource struct {
 
 func (fs *FileSource) Open(file_name string) error {
    if (util.StringInSlice(file_name, []string{ "", "-", "stdin" })) {
-      fmt.Println("Opening stdin...")
       fs.fd = os.Stdin   
    } else {
-      fmt.Printf("Opening %s...\n", file_name)
       fd, err := os.Open(file_name)
       if (err != nil) {
          return err

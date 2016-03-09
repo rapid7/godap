@@ -38,13 +38,15 @@ func (lines *OutputLines) WriteRecord(data map[string]interface{}) {
 
    lines.writer.WriteString(strings.Join(out, lines.delimiter))
    lines.writer.WriteString("\n")
-   lines.fd.Sync()
+   lines.writer.Flush()
 }
 
 func (lines *OutputLines) Start() {
 }
 
 func (lines *OutputLines) Stop() {
+   lines.writer.Flush()
+   lines.Close()
 }
 
 func init() {
@@ -85,9 +87,9 @@ func init() {
 
       err = outputLines.Open(file)
       outputLines.writer = bufio.NewWriter(outputLines.fd)
-      if (header && !util.StringInSlice(outputLines.delimiter, outputLines.fields)) {
+      if (header && !util.StringInSlice(FIELD_WILDCARD, outputLines.fields)) {
          outputLines.writer.WriteString(strings.Join(outputLines.fields, outputLines.delimiter) + "\n")
-         outputLines.fd.Sync()
+         outputLines.writer.Flush()
       }
       return outputLines, nil
    });
