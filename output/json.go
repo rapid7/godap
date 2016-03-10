@@ -13,8 +13,8 @@ type OutputJson struct {
 }
 
 func (oj *OutputJson) WriteRecord(data map[string]interface{}) {
-   json, err := json.Marshal(data)
-   if (err != nil) {
+   json, err := json.Marshal(oj.Sanitize(data))
+   if err != nil {
       panic(err)
    }
    oj.writer.Write(json)
@@ -31,7 +31,7 @@ func (oj *OutputJson) Stop() {
 func init() {
    factory.RegisterOutput("json", func(args []string) (lines api.Output, err error) {
       var file string
-      if (len(args) > 0) {
+      if len(args) > 0 {
          file = args[0]
       }
       outputJson := &OutputJson{}
