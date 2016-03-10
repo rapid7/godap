@@ -1,15 +1,15 @@
 package main
 
 import (
-   "os"
-   "log"
-   "strings"
-   "regexp"
    "github.com/mattn/go-shellwords"
    "github.com/rapid7/godap/api"
    "github.com/rapid7/godap/factory"
    _ "github.com/rapid7/godap/input"
    _ "github.com/rapid7/godap/output"
+   "log"
+   "os"
+   "regexp"
+   "strings"
 )
 
 const VERSION = "0.0.1"
@@ -20,45 +20,45 @@ func main() {
    trace := false
 
    re := regexp.MustCompile("\\s*\\+\\s*")
-   if (len(os.Args) > 1) {
+   if len(os.Args) > 1 {
       for _, bit := range re.Split(strings.Join(os.Args[1:], " "), -1) {
          aset, _ := shellwords.Parse(bit)
-         if (len(aset) < 1) {
-            usage(Console);
+         if len(aset) < 1 {
+            usage(Console)
          }
 
          arg := aset[0]
 
-         if (arg == "--trace") {
+         if arg == "--trace" {
             trace = true
             arg, aset = aset[0], aset[1:]
          }
-        
-         if (arg == "-h" || arg == "--help") {
+
+         if arg == "-h" || arg == "--help" {
             usage(Console)
          }
 
-         if (arg == "--version" || arg == "-v") {
-            version(Console) 
+         if arg == "--version" || arg == "-v" {
+            version(Console)
          }
-      
-         if (arg == "--inputs") {
-            show_inputs(Console)
-         } 
 
-         if (arg == "--outputs") {
+         if arg == "--inputs" {
+            show_inputs(Console)
+         }
+
+         if arg == "--outputs" {
             show_outputs(Console)
          }
 
-         if (arg == "--filters") {
+         if arg == "--filters" {
             show_filters(Console)
          }
 
-         args = append(args, aset) 
+         args = append(args, aset)
       }
    }
 
-   if (len(args) < 2) {
+   if len(args) < 2 {
       usage(Console)
    }
 
@@ -66,12 +66,12 @@ func main() {
    out_args, args := args[len(args)-1], args[:len(args)-1]
 
    inp, err := factory.CreateInput(inp_args)
-   if (err != nil) {
+   if err != nil {
       Console.Printf("Error: %s", err)
       usage(Console)
    }
    out, err := factory.CreateOutput(out_args)
-   if (err != nil) {
+   if err != nil {
       Console.Printf("Error: %s", err)
       usage(Console)
    }
@@ -79,7 +79,7 @@ func main() {
    filters := []api.Filter{}
    for _, arg := range args {
       filter, err := factory.CreateFilter(arg)
-      if (err != nil) {
+      if err != nil {
          Console.Printf("Error: %s", err)
          usage(Console)
       }
@@ -90,12 +90,16 @@ func main() {
 
    for {
       data, error := inp.ReadRecord()
-      if (error != nil) { break }
-      if (data == nil) { continue }
+      if error != nil {
+         break
+      }
+      if data == nil {
+         continue
+      }
 
       // TODO: Actually process data now...
-      docs := []map[string]interface{} { data }
- 
+      docs := []map[string]interface{}{data}
+
       /*for _, filter := range filters {
       }*/
 
@@ -104,9 +108,9 @@ func main() {
       }
    }
 
-   if (trace) {
+   if trace {
       Console.Println("shouldn't see this")
-   }   
+   }
    out.Stop()
 }
 
