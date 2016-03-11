@@ -1,5 +1,5 @@
 package api
 
 type Filter interface {
-   run() bool
+   Process(map[string]interface{}) (res []map[string]interface{}, err error)
 }

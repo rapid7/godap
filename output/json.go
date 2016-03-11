@@ -12,14 +12,19 @@ type OutputJson struct {
    FileDestination
 }
 
-func (oj *OutputJson) WriteRecord(data map[string]interface{}) {
+func (oj *OutputJson) WriteRecord(data map[string]interface{}) (err error) {
    json, err := json.Marshal(oj.Sanitize(data))
-   if err != nil {
-      panic(err)
+   if err == nil {
+      _, err = oj.writer.Write(json)
+      if err == nil {
+         err = oj.writer.WriteByte('\n')
+         if err == nil {
+            err = oj.writer.Flush()
+         }
+      }
    }
-   oj.writer.Write(json)
-   oj.writer.WriteString("\n")
-   oj.writer.Flush()
+
+   return err
 }
 
 func (oj *OutputJson) Start() {

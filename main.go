@@ -4,12 +4,15 @@ import (
    "github.com/mattn/go-shellwords"
    "github.com/rapid7/godap/api"
    "github.com/rapid7/godap/factory"
+   _ "github.com/rapid7/godap/filter"
    _ "github.com/rapid7/godap/input"
    _ "github.com/rapid7/godap/output"
    "log"
    "os"
    "regexp"
+   "runtime"
    "strings"
+   "sync"
 )
 
 const VERSION = "0.0.1"
@@ -88,25 +91,58 @@ func main() {
 
    out.Start()
 
-   for {
-      data, error := inp.ReadRecord()
-      if error != nil {
-         break
-      }
-      if data == nil {
-         continue
-      }
+   numcpu := runtime.NumCPU()
+   runtime.GOMAXPROCS(numcpu)
+   inch := make(chan map[string]interface{})
+   go func() {
+      for {
+         doc, err := inp.ReadRecord()
+         if err != nil {
+            break
+         }
+         if doc == nil {
+            continue
+         }
 
-      // TODO: Actually process data now...
-      docs := []map[string]interface{}{data}
-
-      /*for _, filter := range filters {
-      }*/
-
-      for _, doc := range docs {
-         out.WriteRecord(doc)
+         inch <- doc
       }
+      close(inch)
+   }()
+
+   var wg sync.WaitGroup
+   outch := make(chan map[string]interface{}, 1000)
+   wg.Add(numcpu)
+   for i := 0; i < numcpu; i++ {
+      go func() {
+         defer wg.Done()
+         for doc := range inch {
+            docs := []map[string]interface{}{doc}
+            for _, filter := range filters {
+               for _, doc := range docs {
+                  docs, err = filter.Process(doc)
+               }
+            }
+            for _, doc := range docs {
+               outch <- doc
+            }
+         }
+      }()
    }
+
+   var wg2 sync.WaitGroup
+   wg2.Add(1)
+   go func() {
+      defer wg2.Done()
+      for data := range outch {
+         err := out.WriteRecord(data)
+         if err != nil {
+            panic(err)
+         }
+      }
+   }()
+   wg.Wait()
+   close(outch)
+   wg2.Wait()
 
    if trace {
       Console.Println("shouldn't see this")

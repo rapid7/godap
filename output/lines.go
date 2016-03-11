@@ -1,44 +1,51 @@
 package output
 
 import (
-   "strings"
-   "regexp"
    "bufio"
    "github.com/rapid7/godap/api"
    "github.com/rapid7/godap/factory"
    "github.com/rapid7/godap/util"
+   "regexp"
+   "strings"
 )
 
 const FIELD_WILDCARD = "_"
 
 type OutputLines struct {
    delimiter string
-   fields []string
-   writer *bufio.Writer
+   fields    []string
+   writer    *bufio.Writer
    FileDestination
 }
 
-func (lines *OutputLines) WriteRecord(data map[string]interface{}) {
+func (lines *OutputLines) WriteRecord(data map[string]interface{}) (err error) {
    var out []string
 
-   if (util.StringInSlice(FIELD_WILDCARD, lines.fields)) {
+   if util.StringInSlice(FIELD_WILDCARD, lines.fields) {
       for _, v := range data {
          out = append(out, lines.Sanitize(v).(string))
       }
    } else {
       for _, field := range lines.fields {
          sanitized := lines.Sanitize(data[field])
-         if (sanitized != nil) {
+         if sanitized != nil {
             out = append(out, sanitized.(string))
          }
       }
    }
 
-   if (len(out) < 1) { return }
+   if len(out) < 1 {
+      return
+   }
 
-   lines.writer.WriteString(strings.Join(out, lines.delimiter))
-   lines.writer.WriteString("\n")
-   lines.writer.Flush()
+   _, err = lines.writer.WriteString(strings.Join(out, lines.delimiter))
+   if err == nil {
+      err = lines.writer.WriteByte('\n')
+      if err == nil {
+         err = lines.writer.Flush()
+      }
+   }
+   return err
 }
 
 func (lines *OutputLines) Start() {
@@ -54,7 +61,7 @@ func init() {
       outputLines := &OutputLines{}
       var file string
       outputLines.delimiter = ","
-      outputLines.fields = []string{ FIELD_WILDCARD }
+      outputLines.fields = []string{FIELD_WILDCARD}
 
       header := false
 
@@ -87,10 +94,10 @@ func init() {
 
       err = outputLines.Open(file)
       outputLines.writer = bufio.NewWriter(outputLines.fd)
-      if (header && !util.StringInSlice(FIELD_WILDCARD, outputLines.fields)) {
+      if header && !util.StringInSlice(FIELD_WILDCARD, outputLines.fields) {
          outputLines.writer.WriteString(strings.Join(outputLines.fields, outputLines.delimiter) + "\n")
          outputLines.writer.Flush()
       }
       return outputLines, nil
-   });
+   })
 }
