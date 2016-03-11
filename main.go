@@ -93,7 +93,7 @@ func main() {
 
    numcpu := runtime.NumCPU()
    runtime.GOMAXPROCS(numcpu)
-   inch := make(chan map[string]interface{})
+   inch := make(chan map[string]interface{}, 1000)
    go func() {
       for {
          doc, err := inp.ReadRecord()
@@ -110,7 +110,7 @@ func main() {
    }()
 
    var wg sync.WaitGroup
-   outch := make(chan map[string]interface{}, 1000)
+   outch := make(chan map[string]interface{})
    wg.Add(numcpu)
    for i := 0; i < numcpu; i++ {
       go func() {

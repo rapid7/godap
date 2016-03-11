@@ -4,11 +4,11 @@ import (
    "strings"
 )
 
-type Base struct {
+type BaseFilter struct {
    opts map[string]string
 }
 
-func (b *Base) ParseOpts(args []string) {
+func (b *BaseFilter) ParseOpts(args []string) {
    b.opts = make(map[string]string)
    for _, arg := range args {
       params := strings.SplitN(arg, "=", 2)
