@@ -93,6 +93,63 @@ func init() {
 }
 
 /////////////////////////////////////////////////
+// annotate filter
+/////////////////////////////////////////////////
+
+type FilterAnnotate struct {
+   BaseFilter
+}
+
+func (fs *FilterAnnotate) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+   for k, v := range fs.opts {
+      if docv, ok := doc[k]; ok {
+         switch v {
+         case "size":
+         case "length":
+            doc[fmt.Sprintf("%s.length", k)] = len(docv.(string))
+            break
+         default:
+            panic(fmt.Sprintf("Unsupported annotation: %s", k))
+         }
+      }
+   }
+   return []map[string]interface{}{doc}, nil
+}
+
+func init() {
+   factory.RegisterFilter("annotate", func(args []string) (lines api.Filter, err error) {
+      filterTruncate := &FilterAnnotate{}
+      filterTruncate.ParseOpts(args)
+      return filterTruncate, nil
+   })
+}
+
+/////////////////////////////////////////////////
+// truncate filter
+/////////////////////////////////////////////////
+
+type FilterTruncate struct {
+   BaseFilter
+}
+
+func (fs *FilterTruncate) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+   for k, _ := range fs.opts {
+      if _, ok := doc[k]; ok {
+         doc[k] = ""
+      }
+   }
+   return []map[string]interface{}{doc}, nil
+}
+
+func init() {
+   factory.RegisterFilter("truncate", func(args []string) (lines api.Filter, err error) {
+      filterTruncate := &FilterTruncate{}
+      filterTruncate.ParseOpts(args)
+      return filterTruncate, nil
+   })
+}
+
+/////////////////////////////////////////////////
 // insert filter
 /////////////////////////////////////////////////
 
@@ -257,6 +314,40 @@ func init() {
 }
 
 /////////////////////////////////////////////////
+// split tab filter
+/////////////////////////////////////////////////
+
+type FilterSplitLine struct {
+   BaseFilter
+}
+
+func (fs *FilterSplitLine) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+   var lines []map[string]interface{}
+   for k, _ := range fs.opts {
+      if docv, ok := doc[k]; ok {
+         words := strings.Split(docv.(string), "\n")
+         for idx := 0; idx < len(words); idx++ {
+            newmap := util.Merge(make(map[string]interface{}), doc)
+            newmap[fmt.Sprintf("%s.tab", k)] = words[idx]
+            lines = append(lines, newmap)
+         }
+      }
+   }
+   if len(lines) < 1 {
+      return []map[string]interface{}{doc}, nil
+   }
+   return lines, nil
+}
+
+func init() {
+   factory.RegisterFilter("split_line", func(args []string) (lines api.Filter, err error) {
+      filterSplitLine := &FilterSplitLine{}
+      filterSplitLine.ParseOpts(args)
+      return filterSplitLine, nil
+   })
+}
+
+/////////////////////////////////////////////////
 // split word filter
 /////////////////////////////////////////////////
 
@@ -372,7 +463,7 @@ func (fs *FilterSplitArray) Process(doc map[string]interface{}) (res []map[strin
    var lines []map[string]interface{}
    for k, _ := range fs.opts {
       if docv, ok := doc[k]; ok {
-         if val, ok := docv.([]string); ok {
+         if val, ok := docv.([]interface{}); ok {
             for idx := 0; idx < len(val); idx++ {
                lines = append(lines, map[string]interface{}{fmt.Sprintf("%s.item", k): val[idx]})
             }

@@ -2,6 +2,7 @@ package output
 
 import (
    "bufio"
+   "fmt"
    "github.com/rapid7/godap/api"
    "github.com/rapid7/godap/factory"
    "github.com/rapid7/godap/util"
@@ -23,7 +24,7 @@ func (lines *OutputLines) WriteRecord(data map[string]interface{}) (err error) {
 
    if util.StringInSlice(FIELD_WILDCARD, lines.fields) {
       for _, v := range data {
-         out = append(out, lines.Sanitize(v).(string))
+         out = append(out, fmt.Sprintf("%v", lines.Sanitize(v)))
       }
    } else {
       for _, field := range lines.fields {

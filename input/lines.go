@@ -2,32 +2,32 @@ package input
 
 import (
    "bufio"
+   "errors"
    "github.com/rapid7/godap/api"
    "github.com/rapid7/godap/factory"
 )
 
 type InputLines struct {
-   reader *bufio.Reader
+   scanner *bufio.Scanner
    FileSource
 }
 
 func (lines *InputLines) ReadRecord() (data map[string]interface{}, err error) {
-   line, err := lines.reader.ReadString('\n')
-   if (line != "") {
-      line = line[:len(line)-1]
+   if !lines.scanner.Scan() {
+      return nil, errors.New("eof")
    }
-   return map[string]interface{} { "line": line }, err
+   return map[string]interface{}{"line": lines.scanner.Text()}, err
 }
 
 func init() {
    factory.RegisterInput("lines", func(args []string) (input api.Input, err error) {
       inputLines := &InputLines{}
       var file string
-      if (len(args) > 0) {
+      if len(args) > 0 {
          file = args[0]
       }
       err = inputLines.Open(file)
-      inputLines.reader = bufio.NewReader(inputLines.fd)
+      inputLines.scanner = bufio.NewScanner(inputLines.fd)
       return inputLines, err
-   });
+   })
 }
