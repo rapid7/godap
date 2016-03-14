@@ -16,7 +16,7 @@ type InputPcap struct {
 }
 
 func (pcap *InputPcap) ReadRecord() (data map[string]interface{}, err error) {
-  pktdata, _, err := pcap.handle.ReadPacketData()
+  pktdata, ci, err := pcap.handle.ReadPacketData()
   packet := gopacket.NewPacket(pktdata, layers.LinkTypeEthernet, gopacket.Default)
   payload := packet.Data()
   transportLayer := packet.TransportLayer()
@@ -26,7 +26,7 @@ func (pcap *InputPcap) ReadRecord() (data map[string]interface{}, err error) {
       payload = layerPayload
     }
   }
-  return map[string]interface{}{"packet": payload}, err
+  return map[string]interface{}{"packet.data": payload, "packet.timestamp": ci.Timestamp.UTC()}, err
 }
 
 func (pcap *InputPcap) ParseOpts(args []string) {
