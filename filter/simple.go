@@ -9,6 +9,7 @@ import (
   "github.com/rapid7/godap/api"
   "github.com/rapid7/godap/factory"
   "github.com/rapid7/godap/util"
+  "reflect"
   "regexp"
   "strings"
 )
@@ -108,7 +109,7 @@ func (fs *FilterAnnotate) Process(doc map[string]interface{}) (res []map[string]
       switch v {
       case "size":
       case "length":
-        doc[fmt.Sprintf("%s.length", k)] = len(docv.(string))
+        doc[fmt.Sprintf("%s.length", k)] = reflect.ValueOf(docv).Len()
         break
       default:
         panic(fmt.Sprintf("Unsupported annotation: %s", k))
@@ -275,6 +276,32 @@ func init() {
 }
 
 /////////////////////////////////////////////////
+// not_empty filter
+/////////////////////////////////////////////////
+
+type FilterNotEmpty struct {
+  BaseFilter
+}
+
+func (fs *FilterNotEmpty) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+  for k, _ := range fs.opts {
+    if doc[k] != nil && reflect.ValueOf(doc[k]).Len() < 1 {
+      return make([]map[string]interface{}, 0), nil
+    }
+  }
+
+  return []map[string]interface{}{doc}, nil
+}
+
+func init() {
+  factory.RegisterFilter("not_empty", func(args []string) (lines api.Filter, err error) {
+    filterNotEmpty := &FilterNotEmpty{}
+    filterNotEmpty.ParseOpts(args)
+    return filterNotEmpty, nil
+  })
+}
+
+/////////////////////////////////////////////////
 // where filter
 /////////////////////////////////////////////////
 
@@ -339,6 +366,8 @@ func (fs *FilterTransform) Process(doc map[string]interface{}) (res []map[string
         break
       case "utf8encode":
         // By default all strings are utf8 in go
+        //       doc[k] = fmt.Sprintf("%v", docv)
+        doc[k] = fmt.Sprintf("%s", docv)
         break
       case "base64decode":
         var dest []byte
@@ -353,7 +382,15 @@ func (fs *FilterTransform) Process(doc map[string]interface{}) (res []map[string
       case "qprintdecode":
         panic("unsupported: qprintdecode")
       case "hexencode":
-        doc[k] = hex.EncodeToString([]byte(docv.(string)))
+        switch reflect.TypeOf(docv).Kind() {
+        case reflect.String:
+          doc[k] = hex.EncodeToString([]byte(docv.(string)))
+        case reflect.Slice:
+          doc[k] = hex.EncodeToString(docv.([]byte))
+        default:
+          panic(fmt.Errorf("unknown type to hexencode: %s", reflect.TypeOf(docv)))
+        }
+
         break
       case "hexdecode":
         var dest []byte
