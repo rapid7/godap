@@ -10,6 +10,7 @@ import (
   "github.com/rapid7/godap/factory"
   "github.com/rapid7/godap/util"
   "reflect"
+  "strconv"
   "regexp"
   "strings"
 )
@@ -307,13 +308,13 @@ func init() {
 
 type FilterWhere struct {
   key      string
-  operator func(string, string) bool
+  operator func(string, interface{}) bool
   value    string
   BaseFilter
 }
 
 func (fs *FilterWhere) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
-  if docv, ok := doc[fs.key]; ok && fs.operator(fs.value, docv.(string)) {
+  if docv, ok := doc[fs.key]; ok && fs.operator(fs.value, docv) {
     return []map[string]interface{}{doc}, nil
   }
   return make([]map[string]interface{}, 0), nil
@@ -328,12 +329,23 @@ func init() {
     filterWhere.key = args[0]
     filterWhere.value = args[2]
     if args[1] == "==" {
-      filterWhere.operator = func(lhs string, rhs string) bool {
-        return lhs == rhs
+      filterWhere.operator = func(lhs string, rhs interface{}) bool {
+        switch rhstype := rhs.(type) {
+        case bool:
+          boolval, _ := strconv.ParseBool(lhs)
+          return boolval == rhs.(bool)
+        case string:
+          return lhs == rhs.(string)
+        case int:
+          intval, _ := strconv.Atoi(lhs);
+          return intval == rhs.(int)
+        default:
+          panic(fmt.Errorf("Unsupported type: %T", rhstype))
+        }
       }
     } else if args[1] == "!=" {
-      filterWhere.operator = func(lhs string, rhs string) bool {
-        return lhs != rhs
+      filterWhere.operator = func(lhs string, rhs interface{}) bool {
+        return !reflect.DeepEqual(lhs, rhs)
       }
     } else {
       panic(fmt.Sprintf("Unknown conditional operator for 'where': %s", args[1]))
