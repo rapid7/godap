@@ -328,8 +328,7 @@ func init() {
     }
     filterWhere.key = args[0]
     filterWhere.value = args[2]
-    if args[1] == "==" {
-      filterWhere.operator = func(lhs string, rhs interface{}) bool {
+    equalsFunc := func(lhs string, rhs interface{}) bool {
         switch rhstype := rhs.(type) {
         case bool:
           boolval, _ := strconv.ParseBool(lhs)
@@ -343,9 +342,13 @@ func init() {
           panic(fmt.Errorf("Unsupported type: %T", rhstype))
         }
       }
+    if args[1] == "==" {
+      filterWhere.operator = func(lhs string, rhs interface{}) bool {
+        return equalsFunc(lhs, rhs)
+      }
     } else if args[1] == "!=" {
       filterWhere.operator = func(lhs string, rhs interface{}) bool {
-        return !reflect.DeepEqual(lhs, rhs)
+        return !equalsFunc(lhs, rhs)
       }
     } else {
       panic(fmt.Sprintf("Unknown conditional operator for 'where': %s", args[1]))
