@@ -7,7 +7,9 @@ import (
   "github.com/google/gopacket/pcap"
   "github.com/rapid7/godap/api"
   "github.com/rapid7/godap/factory"
+  "strconv"
   "strings"
+  "time"
 )
 
 type InputPcap struct {
@@ -30,7 +32,6 @@ func (pcap *InputPcap) ReadRecord() (data map[string]interface{}, err error) {
 }
 
 func (pcap *InputPcap) ParseOpts(args []string) {
-  pcap.opts = make(map[string]string)
   for _, arg := range args {
     params := strings.SplitN(arg, "=", 2)
     if len(params) > 1 {
@@ -44,15 +45,32 @@ func (pcap *InputPcap) ParseOpts(args []string) {
 func init() {
   factory.RegisterInput("pcap", func(args []string) (input api.Input, err error) {
     inputPcap := &InputPcap{}
-    var file string
-    if len(args) < 1 {
-      panic("pcap input requires a filename argument")
+    inputPcap.opts = map[string]string{
+      "snaplen": "65536",
+      "promisc": "false",
+      "timeout": "-1",
     }
-    file = args[0]
-    if len(args) > 1 {
-      inputPcap.ParseOpts(args)
+    inputPcap.ParseOpts(args)
+    if file, ok := inputPcap.opts["file"]; ok {
+      inputPcap.handle, err = pcap.OpenOffline(file)
+    } else if iface, ok := inputPcap.opts["iface"]; ok {
+      promisc, err := strconv.ParseBool(inputPcap.opts["promisc"])
+      if err != nil {
+        return nil, fmt.Errorf("Invalid promisc value: %s", inputPcap.opts["promisc"])
+      }
+      timeout, err := strconv.ParseInt(inputPcap.opts["timeout"], 10, 32)
+      if err != nil {
+        return nil, fmt.Errorf("Invalid timeout value: %s", inputPcap.opts["timeout"])
+      }
+      snaplen, err := strconv.ParseInt(inputPcap.opts["snaplen"], 10, 32)
+      if err != nil {
+        return nil, fmt.Errorf("Invalid snaplen value: %s", inputPcap.opts["snaplen"])
+      }
+      inputPcap.handle, err = pcap.OpenLive(iface, int32(snaplen), promisc, time.Duration(timeout))
+    } else {
+      return nil, fmt.Errorf("Either the file or iface option must be provided")
     }
-    inputPcap.handle, err = pcap.OpenOffline(file)
+
     if v, ok := inputPcap.opts["filter"]; ok {
       bpferr := inputPcap.handle.SetBPFFilter(v)
       if bpferr != nil {
