@@ -9,8 +9,6 @@ DAP was written to process terabyte-sized public scan datasets, such as those pr
 
 ## Usage
 
-See [Samples](https://github.com/rapid7/dap/tree/master/samples)
-
 ### Quick Setup for GeoIP Lookups
 
 ```
