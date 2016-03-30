@@ -1,4 +1,5 @@
-# GODAP: The Data Analysis Pipeline (a port of the ruby-based DAP: https://github.com/rapid7/dap)
+# GODAP: The Data Analysis Pipeline 
+(a port of the ruby-based DAP: https://github.com/rapid7/dap)
 
 DAP was created to transform text-based data on the command-line, specializing in transforms that are annoying or difficult to do with existing tools.
 
