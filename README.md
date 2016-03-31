@@ -20,7 +20,7 @@ $ sudo bash
 ```
 
 ```
-$  echo 8.8.8.8 | godap + lines + geo_ip line + json
+$  echo 8.8.8.8 | godap lines + geo_ip line + json
 {"line":"8.8.8.8","line.country_code":"US","line.country_code3":"USA","line.country_name":"United States","line.latitude":"38.0","line.longitude":"-97.0"}
 ```
 
