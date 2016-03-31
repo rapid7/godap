@@ -26,7 +26,7 @@ $  echo 8.8.8.8 | godap lines + geo_ip line + json
 
 Where dap gets fun is doing transforms, like just grabbing the country code:
 ```
-$  echo 8.8.8.8 | godap + lines + geo_ip line + select line.country_code3 + lines
+$  echo 8.8.8.8 | godap lines + geo_ip line + select line.country_code3 + lines
 USA
 ```
 
