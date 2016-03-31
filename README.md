@@ -30,3 +30,7 @@ $  echo 8.8.8.8 | godap lines + geo_ip line + select line.country_code3 + lines
 USA
 ```
 
+## Inputs, filters and outputs
+## Inputs
+## Filters
+## Outputs
