@@ -28,7 +28,7 @@ func (pcap *InputPcap) ReadRecord() (data map[string]interface{}, err error) {
       payload = layerPayload
     }
   }
-  return map[string]interface{}{"packet.data": payload, "packet.timestamp": ci.Timestamp.UTC()}, err
+  return map[string]interface{}{"packet.src": packet.NetworkLayer().NetworkFlow().Src().String(), "packet.data": payload, "packet.timestamp": ci.Timestamp.UTC()}, err
 }
 
 func (pcap *InputPcap) ParseOpts(args []string) {
