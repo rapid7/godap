@@ -30,11 +30,17 @@ func (pcap *InputPcap) ReadRecord() (data map[string]interface{}, err error) {
   }
   networkLayer := packet.NetworkLayer()
   packetSrc := ""
+  packetDst := ""
   if networkLayer != nil {
     networkFlow := networkLayer.NetworkFlow()
     packetSrc = networkFlow.Src().String()
+    packetDst = networkFlow.Dst().String()
   }
-  return map[string]interface{}{"packet.src": packetSrc, "packet.data": payload, "packet.timestamp": ci.Timestamp.UTC()}, err
+  return map[string]interface{}{
+    "packet.src":       packetSrc,
+    "packet.dst":       packetDst,
+    "packet.data":      payload,
+    "packet.timestamp": ci.Timestamp.UTC()}, err
 }
 
 func (pcap *InputPcap) ParseOpts(args []string) {
