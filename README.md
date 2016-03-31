@@ -11,23 +11,22 @@ DAP was written to process terabyte-sized public scan datasets, such as those pr
 
 ### Quick Setup for GeoIP Lookups
 
+Note: The documentation below assumes you've properly setup $GOPATH and $PATH (usually $GOPATH/bin:$PATH) per the official golang documentation.
+
 ```
-$ git clone https://github.com/rapid7/dap.git
-$ cd dap
-$ gem install bundler
-$ bundle install
+$ go get github.com/rapid7/godap
 $ sudo bash
 # mkdir -p /var/lib/geoip && cd /var/lib/geoip && wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz && gunzip GeoLiteCity.dat.gz && mv GeoLiteCity.dat geoip.dat
 ```
 
 ```
-$  echo 8.8.8.8 | bin/dap + lines + geo_ip line + json
+$  echo 8.8.8.8 | godap + lines + geo_ip line + json
 {"line":"8.8.8.8","line.country_code":"US","line.country_code3":"USA","line.country_name":"United States","line.latitude":"38.0","line.longitude":"-97.0"}
 ```
 
 Where dap gets fun is doing transforms, like just grabbing the country code:
 ```
-$  echo 8.8.8.8 | bin/dap + lines + geo_ip line + select line.country_code3 + lines
+$  echo 8.8.8.8 | godap + lines + geo_ip line + select line.country_code3 + lines
 USA
 ```
 
