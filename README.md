@@ -34,6 +34,13 @@ USA
 ## Inputs
 
  * pcap
+   
+  Processes packet capture information via libpcap.
+
+  | Option | Description | Value | Default |
+  |--------|-------------|-------|---------|
+  | iface  | the interface to read packets from. if this is specified, file must not be specified | string interface id | <none> |
+
  * json
  * lines
 
