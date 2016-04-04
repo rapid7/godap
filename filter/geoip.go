@@ -2,7 +2,7 @@ package filter
 
 import (
   "fmt"
-  geoip "github.com/abh/geoip"
+  "github.com/abh/geoip"
   "github.com/rapid7/godap/api"
   "github.com/rapid7/godap/factory"
 )

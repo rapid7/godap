@@ -61,6 +61,7 @@ func init() {
       "snaplen": "65536",
       "promisc": "false",
       "timeout": "-1",
+      "rfmon": "false",
     }
     inputPcap.ParseOpts(args)
     if file, ok := inputPcap.opts["file"]; ok {
@@ -78,7 +79,23 @@ func init() {
       if err != nil {
         return nil, fmt.Errorf("Invalid snaplen value: %s", inputPcap.opts["snaplen"])
       }
-      inputPcap.handle, err = pcap.OpenLive(iface, int32(snaplen), promisc, time.Duration(timeout))
+      rfmon, err := strconv.ParseBool(inputPcap.opts["rfmon"])
+      if err != nil {
+        return nil, fmt.Errorf("Invalid rfmon value: %s", inputPcap.opts["rfmon"])
+      }
+      inactiveHandle, err := pcap.NewInactiveHandle(iface)
+      if (err != nil) {
+        return nil, fmt.Errorf("Could not create new inactive handle")
+      }
+      inactiveHandle.SetSnapLen(int(snaplen))
+      inactiveHandle.SetPromisc(promisc)
+      inactiveHandle.SetTimeout(time.Duration(timeout))
+      inactiveHandle.SetRFMon(rfmon)
+      inputPcap.handle, err = inactiveHandle.Activate()
+      if err != nil {
+        fmt.Println(err)
+        return nil, err
+      }
     } else {
       return nil, fmt.Errorf("Either the file or iface option must be provided")
     }
@@ -89,6 +106,7 @@ func init() {
         err = fmt.Errorf("bpf filter complation failed: %s", bpferr)
       }
     }
+
     return inputPcap, err
   })
 }
