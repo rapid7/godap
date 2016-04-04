@@ -32,5 +32,42 @@ USA
 
 ## Inputs, filters and outputs
 ## Inputs
+
+ * pcap
+ * json
+ * lines
+
 ## Filters
+
+ * rename
+ * not_exists
+ * split_comma
+ * field_split_line
+ * not_empty
+ * field_split_tab
+ * truncate
+ * insert
+ * field_split_array
+ * exists
+ * split_line
+ * select
+ * remove
+ * include
+ * transform
+ * field_array_join_whitespace
+ * digest
+ * geo_ip
+ * annotate
+ * split_word
+ * field_split_comma
+ * field_array_join_comma
+ * exclude
+ * where
+ * split_tab
+ * split_array
+ * field_split_word
+
 ## Outputs
+
+ * json
+ * lines
