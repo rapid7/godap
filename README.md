@@ -31,7 +31,7 @@ USA
 ```
 
 ## Inputs, filters and outputs
-The general syntax when calling godap is ```godap <input> + (<filter +> <filter +> <filter +> ...) + <output>```, where input, filter and output correspond to one of the supported features below. Filters are optional, though an input and output are required. Each feature component is separated by ```+```. Component options are specified immediately after the component declaration. For example, streaming from a wifi adapter and spitting out json documents would resemble: ```godap pcap iface=en0 rfmon=true + json```
+The general syntax when calling godap is ```godap <input> + (<filter +> <filter +> <filter +> ...) + <output>```, where input, filter and output correspond to one of the supported features below. Filters are optional, though an input and output are required. Each feature component is separated by ```+```. Component options are specified immediately after the component declaration. For example, streaming from a wifi adapter and spitting out json documents would resemble: ```godap pcap iface=en0 rfmon=true + json```. Component options with spaces or other complexities can be specified using shell-like quoting. For example, for a bpf pcap filter on the pcap component: ```godap pcap iface=en0 'filter="tcp port 80"' + json```.
 
 ## Inputs
 
