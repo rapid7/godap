@@ -35,14 +35,31 @@ USA
 
  * pcap
    
-  Processes packet capture information via libpcap.
+  Specifies that the input stream is a packet capture. Currently supports streaming in from a file or interface.
 
-  | Option | Description | Value | Default |
-  |--------|-------------|-------|---------|
-  | iface  | the interface to read packets from. if this is specified, file must not be specified | string interface id | <none> |
-
+  | Option  | Description                                                                           | Value               | Default |
+  |---------|---------------------------------------------------------------------------------------|---------------------|---------|
+  | iface   | The interface to read packets from. If iface is specified, file must not be specified | string interface id | none    |
+  | file    | The pcap file to read from. If file is specified, iface must not be specified         | string filename     | none    |
+  | promisc | Whether to capture in promiscuous mode                                                | boolean             | false   |
+  | timeout | The capture timeout                                                                   | integer             | -1 (inf)|
+  | snaplen | The snap length                                                                       | integer             | 65536   |
+  | rfmon   | Whether to capture in monitor mode (applicable only to adapters which support it)     | boolean             | false   |
  * json
+ 
+  Specifies that the input stream is represented as JSON data.
+  
+  | Option  | Description                                                                           | Value               | Default |
+  |---------|---------------------------------------------------------------------------------------|---------------------|---------|
+  | file    | The file to stream from. If not specified, stdin is assumed. Can also be - for stdin. | string filename     | stdin   |
+
  * lines
+
+  Specifies that the input stream is represented as newline-terminated plaintext.
+  
+  | Option  | Description                                                                           | Value               | Default |
+  |---------|---------------------------------------------------------------------------------------|---------------------|---------|
+  | file    | The file to stream from. If not specified, stdin is assumed. Can also be - for stdin. | string filename     | stdin   |
 
 ## Filters
 
