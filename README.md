@@ -41,8 +41,8 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
 
   | Option  | Description                                                                           | Value               | Default |
   |---------|---------------------------------------------------------------------------------------|---------------------|---------|
-  | iface   | The interface to read packets from. If iface is specified, file must not be specified | string interface id | none    |
-  | file    | The pcap file to read from. If file is specified, iface must not be specified         | string filename     | none    |
+  | iface   | The interface to read packets from. If iface is specified, file must not be specified | string interface id | ```<none>```    |
+  | file    | The pcap file to read from. If file is specified, iface must not be specified         | string filename     | ```<none>```    |
   | promisc | Whether to capture in promiscuous mode                                                | boolean             | false   |
   | timeout | The capture timeout                                                                   | integer             | -1 (inf)|
   | snaplen | The snap length                                                                       | integer             | 65536   |
@@ -88,7 +88,7 @@ echo hello world | godap lines + json
 
   | Option               | Description                | Value                          | Default |
   |----------------------|----------------------------|--------------------------------|---------|
-  | ```<document key>``` | The document key to rename | string ```<destination key>``` | none    |
+  | ```<document key>``` | The document key to rename | string ```<destination key>``` | ```<none>```    |
 
   Example:
    ```
@@ -101,7 +101,7 @@ echo world | godap lines + rename line=hello + json
 
   | Option               | Description                | Value                          | Default         |
   |----------------------|----------------------------|--------------------------------|-----------------|
-  | ```<document key>``` | The document key to rename | ```<none>```                   | ```<none>```    |
+  | ```<document key>``` | The document key that must not exist | ```<none>```                   | ```<none>```    |
 
   Example:
    ```
@@ -110,7 +110,34 @@ echo '{"foo":"bar"}' | godap json + not_exists foo + json
    ```
    
  * split_comma
+
+  Extracts comma-separated fields in the specified key's value into new documents
+
+  | Option               | Description                | Value                          | Default         |
+  |----------------------|----------------------------|--------------------------------|-----------------|
+  | ```<document key>``` | The document key which will be split | ```<none>```                   | ```<none>```    |
+
+  Example:
+   ```
+echo '{"foo":"bar,baz"}' | godap json + split_comma foo + json
+{"foo":"bar,baz","foo.word":"bar"}
+{"foo":"bar,baz","foo.word":"baz"}
+   ```
+   
  * field_split_line
+
+  Extracts fields separated by a newline from the source key's value into new fields of the same document
+
+  | Option               | Description                | Value                          | Default         |
+  |----------------------|----------------------------|--------------------------------|-----------------|
+  | ```<document key>``` | The document key which will be split | ```<none>```                   | ```<none>```    |
+
+  Example:
+   ```
+echo '{"foo":"bar\nbaz"}' | godap json + field_split_line foo + json
+{"foo":"bar\nbaz","foo.f1":"bar","foo.f2":"baz"}
+   ```
+   
  * not_empty
  * field_split_tab
  * truncate
