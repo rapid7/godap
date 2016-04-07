@@ -47,6 +47,12 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
   | timeout | The capture timeout                                                                   | integer             | -1 (inf)|
   | snaplen | The snap length                                                                       | integer             | 65536   |
   | rfmon   | Whether to capture in monitor mode (applicable only to adapters which support it)     | boolean             | false   |
+  
+  Example:
+  * Pull packets in from monitor mode: ```godap pcap iface=en0 rfmon=true + json```
+  * Read pcap (or pcap-ng) file contents and convert to json: ```godap pcap file=foo.pcap + json```
+  * Live capture in promiscuous mode: ```godap pcap iface=en0 promisc=true + json```
+
  * json
  
   Specifies that the input stream is represented as JSON data.
@@ -54,6 +60,13 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
   | Option  | Description                                                                           | Value               | Default |
   |---------|---------------------------------------------------------------------------------------|---------------------|---------|
   | file    | The file to stream from. If not specified, stdin is assumed. Can also be - for stdin. | string filename     | stdin   |
+  
+  Example:
+   ```
+echo '{"a":2}' | godap json + lines
+2
+   ```
+
  * lines
 
   Specifies that the input stream is represented as newline-terminated plaintext.
@@ -62,6 +75,11 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
   |---------|---------------------------------------------------------------------------------------|---------------------|---------|
   | file    | The file to stream from. If not specified, stdin is assumed. Can also be - for stdin. | string filename     | stdin   |
 
+  Example:
+   ```
+echo hello world | godap lines + json
+{"line":"hello world"}
+   ```
 ## Filters
 
  * rename
