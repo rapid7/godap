@@ -68,9 +68,9 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
   
   Renames a document field.
 
-  | Option               | Description                | Value                    | Default |
-  |----------------------|----------------------------|--------------------------|---------|
-  | ```<document key>``` | The document key to rename | string <destination key> | none    |
+  | Option               | Description                | Value                          | Default |
+  |----------------------|----------------------------|--------------------------------|---------|
+  | ```<document key>``` | The document key to rename | string ```<destination key>``` | none    |
  * not_exists
  * split_comma
  * field_split_line
