@@ -54,7 +54,6 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
   | Option  | Description                                                                           | Value               | Default |
   |---------|---------------------------------------------------------------------------------------|---------------------|---------|
   | file    | The file to stream from. If not specified, stdin is assumed. Can also be - for stdin. | string filename     | stdin   |
-
  * lines
 
   Specifies that the input stream is represented as newline-terminated plaintext.
@@ -66,6 +65,12 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
 ## Filters
 
  * rename
+  
+  Renames a document field.
+
+  | Option         | Description                | Value                    | Default |
+  |----------------|----------------------------|--------------------------|---------|
+  | <document key> | The document key to rename | string <destination key> | none    |
  * not_exists
  * split_comma
  * field_split_line
