@@ -89,7 +89,26 @@ echo hello world | godap lines + json
   | Option               | Description                | Value                          | Default |
   |----------------------|----------------------------|--------------------------------|---------|
   | ```<document key>``` | The document key to rename | string ```<destination key>``` | none    |
+
+  Example:
+   ```
+echo world | godap lines + rename line=hello + json
+{"hello":"world"}
+   ```
  * not_exists
+  
+  Prevents a document from further processing if a specified key is not present
+
+  | Option               | Description                | Value                          | Default         |
+  |----------------------|----------------------------|--------------------------------|-----------------|
+  | ```<document key>``` | The document key to rename | ```<none>```                   | ```<none>```    |
+
+  Example:
+   ```
+echo '{"foo":"bar"}' | godap json + not_exists foo + json
+
+   ```
+   
  * split_comma
  * field_split_line
  * not_empty
