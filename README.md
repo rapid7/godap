@@ -126,7 +126,7 @@ echo '{"foo":"bar,baz"}' | godap json + split_comma foo + json
    
  * field_split_line
 
-  Extracts fields separated by a newline from the source key's value into new fields of the same document
+  Extracts fields separated by a newline from the source key's value into new fields of the same document. Each new key is named ```<origkey>.f###``` where ### is an incremental integer indicating the original field position from left to right.
 
   | Option               | Description                | Value                          | Default         |
   |----------------------|----------------------------|--------------------------------|-----------------|
@@ -139,7 +139,32 @@ echo '{"foo":"bar\nbaz"}' | godap json + field_split_line foo + json
    ```
    
  * not_empty
+
+  Filters out a document if the value for a given key is empty
+
+  | Option               | Description                   | Value                          | Default         |
+  |----------------------|-------------------------------|--------------------------------|-----------------|
+  | ```<document key>``` | The document key to filter on | ```<none>```                   | ```<none>```    |
+
+  Example:
+   ```
+echo '{"foo":"bar,baz"}' | godap json + not_empty foo + json
+{"foo":"bar,baz"}
+   ```
+
  * field_split_tab
+
+  Splits a key into multiple new subkeys each containing a field from the original value split by ```\t```. Each new key is named ```<origkey>.f###``` where ### is an incremental integer indicating the original field position from left to right.
+
+  | Option               | Description                   | Value                          | Default         |
+  |----------------------|-------------------------------|--------------------------------|-----------------|
+  | ```<document key>``` | The document key to split     | ```<none>```                   | ```<none>```    |
+
+  Example:
+   ```
+echo '{"foo":"bar\tbaz"}' | godap json + field_split_tab foo + json
+{"foo":"bar\tbaz","foo.f1":"bar","foo.f2":"baz"}
+   ```
  * truncate
  * insert
  * field_split_array
