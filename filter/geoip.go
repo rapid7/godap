@@ -7,18 +7,13 @@ import (
   "github.com/rapid7/godap/factory"
 )
 
-type Decoder interface {
-  Decode(string, string, map[string]interface{})
-}
-
 /////////////////////////////////////////////////
 // geo_ip filter
 /////////////////////////////////////////////////
 
 type FilterGeoIP struct {
-  db *geoip.GeoIP
   BaseFilter
-  Decoder
+  db *geoip.GeoIP
 }
 
 func (b *FilterGeoIP) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
@@ -48,7 +43,7 @@ func (f *FilterGeoIP) Decode(ip string, field string, doc map[string]interface{}
 }
 
 func init() {
-  factory.RegisterFilter("geo_ip", func(args []string) (lines api.Filter, err error) {
+  factory.RegisterFilter("geo_ip", func(args []string) (geoIp api.Filter, err error) {
     filterGeoIP := &FilterGeoIP{}
     filterGeoIP.ParseOpts(args)
     for _, file := range []string{"geoip.dat", "geoip_city.dat", "GeoCity.dat", "IP_V4_CITY.dat", "GeoCityLite.dat"} {
@@ -62,5 +57,48 @@ func init() {
       return nil, err
     }
     return filterGeoIP, nil
+  })
+}
+
+/////////////////////////////////////////////////
+// geo_ip_org filter
+/////////////////////////////////////////////////
+
+type FilterGeoIPOrg struct {
+  BaseFilter
+  db *geoip.GeoIP
+}
+
+func (b *FilterGeoIPOrg) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+  for k, _ := range b.opts {
+    if docv, ok := doc[k]; ok {
+      b.Decode(docv.(string), k, doc)
+    }
+  }
+  return []map[string]interface{}{doc}, nil
+}
+
+func (f *FilterGeoIPOrg) Decode(ip string, field string, doc map[string]interface{}) {
+  record := f.db.GetOrg(ip)
+  if record != "" {
+    doc[fmt.Sprintf("%s.org", field)] = record
+  }
+}
+
+func init() {
+  factory.RegisterFilter("geo_ip_org", func(args []string) (geoIpOrg api.Filter, err error) {
+    filterGeoIPOrg := &FilterGeoIPOrg{}
+    filterGeoIPOrg.ParseOpts(args)
+    for _, file := range []string{"geoip_org.dat", "IP_V4_ORG.dat"} {
+      filterGeoIPOrg.db, err = geoip.Open(fmt.Sprintf("%s/%s", "/var/lib/geoip", file))
+      if err == nil {
+        break
+      }
+    }
+    if filterGeoIPOrg == nil {
+      err = fmt.Errorf("Could not open geoip org database")
+      return nil, err
+    }
+    return filterGeoIPOrg, nil
   })
 }

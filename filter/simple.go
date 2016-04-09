@@ -442,7 +442,7 @@ func (fs *FilterSplitLine) Process(doc map[string]interface{}) (res []map[string
       words := strings.Split(docv.(string), "\n")
       for idx := 0; idx < len(words); idx++ {
         newmap := util.Merge(make(map[string]interface{}), doc)
-        newmap[fmt.Sprintf("%s.tab", k)] = words[idx]
+        newmap[fmt.Sprintf("%s.line", k)] = words[idx]
         lines = append(lines, newmap)
       }
     }
@@ -723,7 +723,7 @@ type FilterFieldSplitArray struct {
 func (fs *FilterFieldSplitArray) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
   for k, _ := range fs.opts {
     if docv, ok := doc[k]; ok {
-      if val, ok := docv.([]string); ok {
+      if val, ok := docv.([]interface{}); ok {
         for idx := 0; idx < len(val); idx++ {
           doc[fmt.Sprintf("%s.f%d", k, idx+1)] = val[idx]
         }

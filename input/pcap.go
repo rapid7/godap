@@ -21,6 +21,16 @@ func (pcap *InputPcap) ReadRecord() (data map[string]interface{}, err error) {
   pktdata, ci, err := pcap.handle.ReadPacketData()
   packet := gopacket.NewPacket(pktdata, layers.LinkTypeEthernet, gopacket.Default)
   payload := packet.Data()
+  packetSrc := ""
+  packetDst := ""
+
+  networkLayer := packet.NetworkLayer()
+  if networkLayer != nil {
+    networkFlow := networkLayer.NetworkFlow()
+    packetSrc = networkFlow.Src().String()
+    packetDst = networkFlow.Dst().String()
+  }
+
   transportLayer := packet.TransportLayer()
   if transportLayer != nil {
     layerPayload := transportLayer.LayerPayload()
@@ -28,14 +38,7 @@ func (pcap *InputPcap) ReadRecord() (data map[string]interface{}, err error) {
       payload = layerPayload
     }
   }
-  networkLayer := packet.NetworkLayer()
-  packetSrc := ""
-  packetDst := ""
-  if networkLayer != nil {
-    networkFlow := networkLayer.NetworkFlow()
-    packetSrc = networkFlow.Src().String()
-    packetDst = networkFlow.Dst().String()
-  }
+
   return map[string]interface{}{
     "packet.src":       packetSrc,
     "packet.dst":       packetDst,
