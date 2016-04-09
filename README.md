@@ -166,8 +166,44 @@ echo '{"foo":"bar\tbaz"}' | godap json + field_split_tab foo + json
 {"foo":"bar\tbaz","foo.f1":"bar","foo.f2":"baz"}
    ```
  * truncate
+
+  Sets the value of the specified key to the empty string
+
+  | Option               | Description                   | Value                          | Default         |
+  |----------------------|-------------------------------|--------------------------------|-----------------|
+  | ```<document key>``` | The key to truncate           | ```<none>```                   | ```<none>```    |
+
+  Example:
+   ```
+echo '{"foo":"bar\tbaz"}' | godap json + truncate foo + json
+{"foo":""}
+   ```
  * insert
+
+  Adds a new value to the document
+
+  | Option               | Description                   | Value                          | Default                 |
+  |----------------------|-------------------------------|--------------------------------|-------------------------|
+  | ```<document key>``` | The key to truncate           | ```<document value>```         | ```<empty string>```    |
+
+  Example:
+   ```
+echo '{"foo":"bar\tbaz"}' | godap json + insert a=b + json
+{"a":"b","foo":"bar\tbaz"}
+   ```
  * field_split_array
+
+  Splits a field that contains an array data type value into multiple new fields. Each new key is named ```<origkey>.f###``` where ### is an incremental integer indicating the original field position from left to right. The array can contain multiple different data types.
+
+  | Option               | Description                   | Value                          | Default                 |
+  |----------------------|-------------------------------|--------------------------------|-------------------------|
+  | ```<document key>``` | The key to split              | ```<none>```                   | ```<none>```            |
+
+  Example:
+   ```
+echo '{"foo":["a",2]}' | godap json + field_split_array foo + json
+{"foo":["a",2],"foo.f1":"a","foo.f2":2}
+   ```
  * exists
  * split_line
  * select
