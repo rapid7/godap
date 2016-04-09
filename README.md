@@ -63,7 +63,7 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
   
   Example:
    ```
-echo '{"a":2}' | godap json + lines
+$  echo '{"a":2}' | godap json + lines
 2
    ```
 
@@ -77,7 +77,7 @@ echo '{"a":2}' | godap json + lines
 
   Example:
    ```
-echo hello world | godap lines + json
+$  echo hello world | godap lines + json
 {"line":"hello world"}
    ```
 ## Filters
@@ -92,7 +92,7 @@ echo hello world | godap lines + json
 
   Example:
    ```
-echo world | godap lines + rename line=hello + json
+$  echo world | godap lines + rename line=hello + json
 {"hello":"world"}
    ```
  * not_exists
@@ -105,7 +105,7 @@ echo world | godap lines + rename line=hello + json
 
   Example:
    ```
-echo '{"foo":"bar"}' | godap json + not_exists foo + json
+$  echo '{"foo":"bar"}' | godap json + not_exists foo + json
 
    ```
    
@@ -119,7 +119,7 @@ echo '{"foo":"bar"}' | godap json + not_exists foo + json
 
   Example:
    ```
-echo '{"foo":"bar,baz"}' | godap json + split_comma foo + json
+$  echo '{"foo":"bar,baz"}' | godap json + split_comma foo + json
 {"foo":"bar,baz","foo.word":"bar"}
 {"foo":"bar,baz","foo.word":"baz"}
    ```
@@ -134,7 +134,7 @@ echo '{"foo":"bar,baz"}' | godap json + split_comma foo + json
 
   Example:
    ```
-echo '{"foo":"bar\nbaz"}' | godap json + field_split_line foo + json
+$  echo '{"foo":"bar\nbaz"}' | godap json + field_split_line foo + json
 {"foo":"bar\nbaz","foo.f1":"bar","foo.f2":"baz"}
    ```
    
@@ -148,7 +148,7 @@ echo '{"foo":"bar\nbaz"}' | godap json + field_split_line foo + json
 
   Example:
    ```
-echo '{"foo":"bar,baz"}' | godap json + not_empty foo + json
+$  echo '{"foo":"bar,baz"}' | godap json + not_empty foo + json
 {"foo":"bar,baz"}
    ```
 
@@ -162,7 +162,7 @@ echo '{"foo":"bar,baz"}' | godap json + not_empty foo + json
 
   Example:
    ```
-echo '{"foo":"bar\tbaz"}' | godap json + field_split_tab foo + json
+$  echo '{"foo":"bar\tbaz"}' | godap json + field_split_tab foo + json
 {"foo":"bar\tbaz","foo.f1":"bar","foo.f2":"baz"}
    ```
  * truncate
@@ -175,7 +175,7 @@ echo '{"foo":"bar\tbaz"}' | godap json + field_split_tab foo + json
 
   Example:
    ```
-echo '{"foo":"bar\tbaz"}' | godap json + truncate foo + json
+$  echo '{"foo":"bar\tbaz"}' | godap json + truncate foo + json
 {"foo":""}
    ```
  * insert
@@ -188,7 +188,7 @@ echo '{"foo":"bar\tbaz"}' | godap json + truncate foo + json
 
   Example:
    ```
-echo '{"foo":"bar\tbaz"}' | godap json + insert a=b + json
+$  echo '{"foo":"bar\tbaz"}' | godap json + insert a=b + json
 {"a":"b","foo":"bar\tbaz"}
    ```
  * field_split_array
@@ -201,10 +201,24 @@ echo '{"foo":"bar\tbaz"}' | godap json + insert a=b + json
 
   Example:
    ```
-echo '{"foo":["a",2]}' | godap json + field_split_array foo + json
+$  echo '{"foo":["a",2]}' | godap json + field_split_array foo + json
 {"foo":["a",2],"foo.f1":"a","foo.f2":2}
    ```
  * exists
+
+  Ensures the specified key exists in the source document. If it does not, the document is removed from the pipeline.
+
+  | Option               | Description                   | Value                          | Default                 |
+  |----------------------|-------------------------------|--------------------------------|-------------------------|
+  | ```<document key>``` | The key that must exist       | ```<none>```                   | ```<none>```            |
+
+  Example:
+   ```
+$  echo '{"foo":"bar\tbaz"}' | godap json + exists a + json
+$  echo '{"foo":"bar\tbaz"}' | godap json + exists foo + json
+{"foo":"bar\tbaz"}
+
+   ```
  * split_line
  * select
  * remove
