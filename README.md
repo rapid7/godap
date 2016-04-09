@@ -220,7 +220,33 @@ $  echo '{"foo":"bar\tbaz"}' | godap json + exists foo + json
 
    ```
  * split_line
+
+  Splits a given key's value into multiple new documents with the same key name, each document containing a field extracted from the source key's value separated by a newline.
+
+  | Option               | Description                   | Value                          | Default                 |
+  |----------------------|-------------------------------|--------------------------------|-------------------------|
+  | ```<document key>``` | The key to split              | ```<none>```                   | ```<none>```            |
+
+  Example:
+   ```
+$  echo '{"foo":"bar\nbaz"}' | godap json + split_line foo + json
+{"foo":"bar\nbaz","foo.line":"bar"}
+{"foo":"bar\nbaz","foo.line":"baz"}
+   ```
  * select
+
+  Filters all but the specified key
+
+  | Option               | Description                   | Value                          | Default                 |
+  |----------------------|-------------------------------|--------------------------------|-------------------------|
+  | ```<document key>``` | The key to split              | ```<none>```                   | ```<none>```            |
+
+  Example:
+   ```
+$  echo '{"foo":"bar\nbaz"}' | godap json + split_line foo + json
+{"foo":"bar\nbaz","foo.line":"bar"}
+{"foo":"bar\nbaz","foo.line":"baz"}
+   ```
  * remove
  * include
  * transform
