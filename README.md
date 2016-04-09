@@ -276,6 +276,20 @@ $  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + include a=b + json
 {"a":"b","baz":"qux","foo":"bar"}
    ```
  * transform
+
+  Ensures a document key includes a specified string.
+
+  | Option               | Description                   | Value                          | Default                 |
+  |----------------------|-------------------------------|--------------------------------|-------------------------|
+  | ```<document key>``` | The key to transform          | ```utf8encode``` or ```ascii``` or         | ```<none>```            |
+ 
+
+  Example:
+   ```
+$  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + include a=c + json
+$  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + include a=b + json
+{"a":"b","baz":"qux","foo":"bar"}
+   ```
  * field_array_join_whitespace
  * digest
  * geo_ip
