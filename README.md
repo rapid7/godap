@@ -281,14 +281,14 @@ $  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + include a=b + json
 
   | Option               | Description                   | Value                          | Default                 |
   |----------------------|-------------------------------|--------------------------------|-------------------------|
-  | ```<document key>``` | The key to transform          | ```utf8encode``` or ```ascii``` or         | ```<none>```            |
+  | ```<document key>``` | The key to transform          | ```utf8encode``` or ```ascii``` or ```base64encode``` or ```base64decode``` or ```upcase``` or ```downcase``` or ```hexencode``` or ```ascii```         | ```<none>```            |
  
 
   Example:
    ```
-$  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + include a=c + json
-$  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + include a=b + json
-{"a":"b","baz":"qux","foo":"bar"}
+$  echo '{"foo":"bar"}' | godap json + transform foo=base64encode + json
+{"foo":"YmFy"}
+
    ```
  * field_array_join_whitespace
  * digest
