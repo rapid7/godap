@@ -103,7 +103,6 @@ func main() {
       if doc == nil {
         continue
       }
-
       inch <- doc
     }
     close(inch)

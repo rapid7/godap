@@ -5,19 +5,19 @@ import (
   "encoding/json"
   "github.com/rapid7/godap/api"
   "github.com/rapid7/godap/factory"
-  "io"
 )
 
 type InputJson struct {
-  scanner *bufio.Scanner
+  reader *bufio.Reader
   FileSource
 }
 
 func (js *InputJson) ReadRecord() (data map[string]interface{}, err error) {
-  if !js.scanner.Scan() {
-    return nil, io.EOF
+  text, err := js.reader.ReadString('\n')
+  if text != "" {
+    text = text[:len(text)-1]
   }
-  return data, json.Unmarshal(js.scanner.Bytes(), &data)
+  return data, json.Unmarshal([]byte(text), &data)
 }
 
 func NewInputJson(args []string) (input api.Input, err error) {
@@ -27,7 +27,7 @@ func NewInputJson(args []string) (input api.Input, err error) {
     file = args[0]
   }
   err = inputJson.Open(file)
-  inputJson.scanner = bufio.NewScanner(inputJson.fd)
+  inputJson.reader = bufio.NewReader(inputJson.fd)
   return inputJson, err
 }
 
