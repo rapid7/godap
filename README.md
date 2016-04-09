@@ -235,20 +235,46 @@ $  echo '{"foo":"bar\nbaz"}' | godap json + split_line foo + json
    ```
  * select
 
-  Filters all but the specified key
+  Keeps only the specified keys in the resulting document. Multiple key names can be specified.
 
   | Option               | Description                   | Value                          | Default                 |
   |----------------------|-------------------------------|--------------------------------|-------------------------|
-  | ```<document key>``` | The key to split              | ```<none>```                   | ```<none>```            |
+  | ```<document key>``` | The key to keep               | ```<none>```                   | ```<none>```            |
 
   Example:
    ```
-$  echo '{"foo":"bar\nbaz"}' | godap json + split_line foo + json
-{"foo":"bar\nbaz","foo.line":"bar"}
-{"foo":"bar\nbaz","foo.line":"baz"}
+$  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + select foo + json
+{"foo":"bar"}
+$  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + select foo baz + json
+{"baz":"qux","foo":"bar"}
    ```
  * remove
+
+  Removes the specified keys from the source document.
+
+  | Option               | Description                   | Value                          | Default                 |
+  |----------------------|-------------------------------|--------------------------------|-------------------------|
+  | ```<document key>``` | The key to remove             | ```<none>```                   | ```<none>```            |
+
+  Example:
+   ```
+$  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + remove foo baz + json
+{"a":"b"}
+   ```
  * include
+
+  Ensures a document key includes a specified string.
+
+  | Option               | Description                   | Value                          | Default                 |
+  |----------------------|-------------------------------|--------------------------------|-------------------------|
+  | ```<document key>``` | The key to remove             | ```string contains_str```      | ```<none>```            |
+
+  Example:
+   ```
+$  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + include a=c + json
+$  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + include a=b + json
+{"a":"b","baz":"qux","foo":"bar"}
+   ```
  * transform
  * field_array_join_whitespace
  * digest
