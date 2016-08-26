@@ -10,8 +10,8 @@ import (
   "github.com/rapid7/godap/factory"
   "github.com/rapid7/godap/util"
   "reflect"
-  "strconv"
   "regexp"
+  "strconv"
   "strings"
 )
 
@@ -125,6 +125,35 @@ func init() {
     filterTruncate := &FilterAnnotate{}
     filterTruncate.ParseOpts(args)
     return filterTruncate, nil
+  })
+}
+
+/////////////////////////////////////////////////
+// flatten filter
+/////////////////////////////////////////////////
+
+type FilterFlatten struct {
+  BaseFilter
+}
+
+func (fs *FilterFlatten) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+  for k, _ := range fs.opts {
+    if val, ok := doc[k]; ok {
+      if valmap, ok := val.(map[string]interface{}); ok {
+        for valkey, valval := range valmap {
+          doc[fmt.Sprintf("%s.%s", k, valkey)] = valval
+        }
+      }
+    }
+  }
+  return []map[string]interface{}{doc}, nil
+}
+
+func init() {
+  factory.RegisterFilter("flatten", func(args []string) (lines api.Filter, err error) {
+    filterFlatten := &FilterFlatten{}
+    filterFlatten.ParseOpts(args)
+    return filterFlatten, nil
   })
 }
 
@@ -329,19 +358,19 @@ func init() {
     filterWhere.key = args[0]
     filterWhere.value = args[2]
     equalsFunc := func(lhs string, rhs interface{}) bool {
-        switch rhstype := rhs.(type) {
-        case bool:
-          boolval, _ := strconv.ParseBool(lhs)
-          return boolval == rhs.(bool)
-        case string:
-          return lhs == rhs.(string)
-        case int:
-          intval, _ := strconv.Atoi(lhs);
-          return intval == rhs.(int)
-        default:
-          panic(fmt.Errorf("Unsupported type: %T", rhstype))
-        }
+      switch rhstype := rhs.(type) {
+      case bool:
+        boolval, _ := strconv.ParseBool(lhs)
+        return boolval == rhs.(bool)
+      case string:
+        return lhs == rhs.(string)
+      case int:
+        intval, _ := strconv.Atoi(lhs)
+        return intval == rhs.(int)
+      default:
+        panic(fmt.Errorf("Unsupported type: %T", rhstype))
       }
+    }
     if args[1] == "==" {
       filterWhere.operator = func(lhs string, rhs interface{}) bool {
         return equalsFunc(lhs, rhs)
