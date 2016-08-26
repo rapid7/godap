@@ -178,6 +178,20 @@ $  echo '{"foo":"bar\tbaz"}' | godap json + field_split_tab foo + json
 $  echo '{"foo":"bar\tbaz"}' | godap json + truncate foo + json
 {"foo":""}
    ```
+ * flatten
+
+  Flattens pesky nested json into "key.name" properties of the top-level document. The original key/value are left
+  untouched (you can remove them using the `remove` filter).
+
+  | Option               | Description                   | Value                          | Default         |
+  |----------------------|-------------------------------|--------------------------------|-----------------|
+  | ```<document key>``` | The key to flatten            | ```<none>```                   | ```<none>```    |
+
+  Example:
+   ```
+$ echo '{"foo":{"bar": "baz"}}' | godap json + flatten foo + json
+{"foo":{"bar":"baz"},"foo.bar":"baz"}
+   ```
  * insert
 
   Adds a new value to the document
