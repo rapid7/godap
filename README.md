@@ -35,7 +35,7 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
 
 ## Inputs
 
- * pcap
+ * <a id="pcap">pcap</a>
    
   Specifies that the input stream is a packet capture. Currently supports streaming in from a file or interface.
 
