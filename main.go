@@ -15,7 +15,7 @@ import (
 	"sync"
 )
 
-const VERSION = "0.0.1"
+const VERSION = "0.9.0"
 
 func main() {
 	Console := log.New(os.Stderr, "", 0)
@@ -89,6 +89,7 @@ func main() {
 		filters = append(filters, filter)
 	}
 
+	inp.Start()
 	out.Start()
 
 	numcpu := runtime.NumCPU()
@@ -146,6 +147,7 @@ func main() {
 	if trace {
 		Console.Println("shouldn't see this")
 	}
+	inp.Stop()
 	out.Stop()
 }
 

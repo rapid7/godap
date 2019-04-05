@@ -11,6 +11,10 @@ type InputLines struct {
 	FileSource
 }
 
+func (lines *InputLines) Start() {}
+
+func (lines *InputLines) Stop() {}
+
 func (lines *InputLines) ReadRecord() (data map[string]interface{}, err error) {
 	text, err := lines.reader.ReadString('\n')
 	if text != "" {

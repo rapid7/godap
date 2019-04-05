@@ -12,6 +12,10 @@ type InputJson struct {
 	FileSource
 }
 
+func (js *InputJson) Start() {}
+
+func (js *InputJson) Stop() {}
+
 func (js *InputJson) ReadRecord() (data map[string]interface{}, err error) {
 	text, err := js.reader.ReadString('\n')
 	if text != "" {

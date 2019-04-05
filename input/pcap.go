@@ -17,6 +17,10 @@ type InputPcap struct {
 	opts   map[string]string
 }
 
+func (pcap *InputPcap) Start() {}
+
+func (pcap *InputPcap) Stop() {}
+
 func (pcap *InputPcap) ReadRecord() (data map[string]interface{}, err error) {
 	pktdata, ci, err := pcap.handle.ReadPacketData()
 	packet := gopacket.NewPacket(pktdata, layers.LinkTypeEthernet, gopacket.Default)
