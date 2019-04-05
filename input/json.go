@@ -2,12 +2,13 @@ package input
 
 import (
 	"bufio"
-	"encoding/json"
+	"github.com/json-iterator/go"
 	"github.com/rapid7/godap/api"
 	"github.com/rapid7/godap/factory"
 )
 
 type InputJson struct {
+	json   jsoniter.API
 	reader *bufio.Reader
 	FileSource
 }
@@ -21,7 +22,7 @@ func (js *InputJson) ReadRecord() (data map[string]interface{}, err error) {
 	if text != "" {
 		text = text[:len(text)-1]
 	}
-	return data, json.Unmarshal([]byte(text), &data)
+	return data, js.json.Unmarshal([]byte(text), &data)
 }
 
 func NewInputJson(args []string) (input api.Input, err error) {
@@ -32,6 +33,7 @@ func NewInputJson(args []string) (input api.Input, err error) {
 	}
 	err = inputJson.Open(file)
 	inputJson.reader = bufio.NewReader(inputJson.fd)
+	inputJson.json = jsoniter.Config{UseNumber: true}.Froze()
 	return inputJson, err
 }
 

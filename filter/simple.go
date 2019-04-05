@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/rapid7/godap/api"
@@ -786,11 +787,20 @@ func (fs *FilterFieldJoin) Process(doc map[string]interface{}) (res []map[string
 	var dest_val string = ""
 	for _, src := range fs.source {
 		if docv, ok := doc[src]; ok {
-			if val, ok := docv.(string); ok {
-				if dest_val != "" {
-					dest_val += fs.sep
-				}
-				dest_val += val
+			if dest_val != "" {
+				dest_val += fs.sep
+			}
+			switch v := docv.(type) {
+			case string:
+				dest_val += v
+			case int:
+				dest_val += strconv.Itoa(v)
+			case bool:
+				dest_val += strconv.FormatBool(v)
+			case float64:
+				dest_val += strconv.FormatFloat(v, 'E', -1, 64)
+			case json.Number:
+				dest_val += string(v)
 			}
 		}
 	}
