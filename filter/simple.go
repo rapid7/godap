@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"github.com/rapid7/godap/api"
 	"github.com/rapid7/godap/factory"
@@ -767,6 +768,58 @@ func init() {
 		filterFieldSplitArray := &FilterFieldSplitArray{}
 		filterFieldSplitArray.ParseOpts(args)
 		return filterFieldSplitArray, nil
+	})
+}
+
+/////////////////////////////////////////////////
+// field array join comma filter
+/////////////////////////////////////////////////
+
+type FilterFieldJoin struct {
+	BaseFilter
+	sep    string
+	dest   string
+	source []string
+}
+
+func (fs *FilterFieldJoin) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+	var dest_val string = ""
+	for _, src := range fs.source {
+		if docv, ok := doc[src]; ok {
+			if val, ok := docv.(string); ok {
+				if dest_val != "" {
+					dest_val += fs.sep
+				}
+				dest_val += val
+			}
+		}
+	}
+
+	doc[fs.dest] = dest_val
+	return []map[string]interface{}{doc}, nil
+}
+
+func init() {
+	factory.RegisterFilter("field_join", func(args []string) (lines api.Filter, err error) {
+		filterFieldJoin := &FilterFieldJoin{}
+		filterFieldJoin.ParseOpts(args)
+		var ok bool
+		filterFieldJoin.sep = ","
+		if filterFieldJoin.opts["sep"] != "" {
+			filterFieldJoin.sep = filterFieldJoin.opts["sep"]
+		}
+
+		if filterFieldJoin.dest, ok = filterFieldJoin.opts["dest"]; !ok {
+			return nil, errors.New("A destination field name must be supplied in `dest` for `field_join`.")
+		}
+
+		var source_str string
+		if source_str, ok = filterFieldJoin.opts["source"]; !ok || source_str == "" {
+			return nil, errors.New("At least one field must be supplied in `source` for `field_join`. Multiple fields can be separated by commas.")
+		}
+		filterFieldJoin.source = strings.Split(source_str, ",")
+
+		return filterFieldJoin, nil
 	})
 }
 
