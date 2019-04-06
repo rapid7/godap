@@ -7,15 +7,13 @@ import (
 	"github.com/rapid7/godap/api"
 	"github.com/rapid7/godap/factory"
 	"github.com/rapid7/godap/util"
-	"strings"
 )
 
 type OutputBadger struct {
-	db             *badger.DB
-	batch          *badger.WriteBatch
-	string_builder *strings.Builder
-	key_field      string
-	value_field    string
+	db          *badger.DB
+	batch       *badger.WriteBatch
+	key_field   string
+	value_field string
 }
 
 func (ob *OutputBadger) WriteRecord(data map[string]interface{}) (err error) {
@@ -48,7 +46,6 @@ func init() {
 	factory.RegisterOutput("badger", func(args []string) (lines api.Output, err error) {
 		ob := &OutputBadger{}
 		parsed_opts := util.ParseOpts(args)
-		ob.string_builder = &strings.Builder{}
 		opts := badger.DefaultOptions
 		if ob.key_field = parsed_opts["key_field"]; ob.key_field == "" {
 			return nil, errors.New("No `key_field` specified.")

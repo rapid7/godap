@@ -36,13 +36,13 @@ func (ib *InputBadger) ReadRecord() (data map[string]interface{}, err error) {
 		}
 	}
 	ib.iterator.Next()
-	return data, err // TODO error
+	return data, err
 }
 
 func (ib *InputBadger) Start() {
 	ib.txn = ib.db.NewTransaction(false)
 	iterator_opts := badger.DefaultIteratorOptions
-	iterator_opts.PrefetchValues = ib.prefetch_values // TODO: allow customization
+	iterator_opts.PrefetchValues = ib.prefetch_values
 	ib.iterator = ib.txn.NewIterator(iterator_opts)
 	if ib.prefix != nil {
 		ib.iterator.Seek(ib.prefix)
