@@ -304,6 +304,38 @@ $  echo '{"foo":"bar"}' | godap json + transform foo=base64encode + json
 {"foo":"YmFy"}
 
    ```
+ * <a id="reverse">reverse</a>
+
+  Reverses the string contents of one or more fields. If the field is not a string, this is a no-op.
+
+  | Option               | Description                   | Value                          | Default                 |
+  |----------------------|-------------------------------|--------------------------------|-------------------------|
+  | ```<field name>```   | The name of the string field to reverse | ```<none>``` | ```<none>``` |
+
+
+  Example:
+   ```
+$ echo '{"foo":"baz","bar":"qux"}' | ./godap json + reverse foo bar + json
+{"bar":"xuq","foo":"zab"}
+
+   ```
+ * <a id="reverse">join</a>
+
+  Joins one or more source fields into a destination field, separated by a comma. This filter will attempt to cast the source field types to a string representation.
+
+  | Option               | Description                   | Value                          | Default                 |
+  |----------------------|-------------------------------|--------------------------------|-------------------------|
+  | ```source```         | A comma-separated list of source field names | ```<none>``` | ```<none>``` |
+  | ```dest```           | A destination field which will receive the join result | ```<none>``` | ```<none>``` |
+  | ```sep```            | A separator to join the fields by | ```<string>``` | ```,``` |
+
+
+  Example:
+   ```
+$ echo '{"foo":"baz","bar":"qux"}' | ./godap json + join source=foo,bar dest=example sep=# + json
+{"bar":"qux","example":"baz#qux","foo":"baz"}
+
+   ```
  * <a id="field_array_join_whitespace">field_array_join_whitespace</a>
  * <a id="digest">digest</a>
  * <a id="geo_ip">geo_ip</a>

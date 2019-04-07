@@ -773,7 +773,34 @@ func init() {
 }
 
 /////////////////////////////////////////////////
-// field array join comma filter
+// field string reverse filter
+/////////////////////////////////////////////////
+
+type FilterReverse struct {
+	BaseFilter
+}
+
+func (fs *FilterReverse) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+	for k := range fs.opts {
+		if docv, ok := doc[k]; ok {
+			if val, ok := docv.(string); ok {
+				doc[k] = util.Reverse(val)
+			}
+		}
+	}
+	return []map[string]interface{}{doc}, nil
+}
+
+func init() {
+	factory.RegisterFilter("reverse", func(args []string) (lines api.Filter, err error) {
+		filterReverse := &FilterReverse{}
+		filterReverse.ParseOpts(args)
+		return filterReverse, nil
+	})
+}
+
+/////////////////////////////////////////////////
+// field join filter
 /////////////////////////////////////////////////
 
 type FilterFieldJoin struct {
@@ -810,7 +837,7 @@ func (fs *FilterFieldJoin) Process(doc map[string]interface{}) (res []map[string
 }
 
 func init() {
-	factory.RegisterFilter("field_join", func(args []string) (lines api.Filter, err error) {
+	factory.RegisterFilter("join", func(args []string) (lines api.Filter, err error) {
 		filterFieldJoin := &FilterFieldJoin{}
 		filterFieldJoin.ParseOpts(args)
 		var ok bool
@@ -820,12 +847,12 @@ func init() {
 		}
 
 		if filterFieldJoin.dest, ok = filterFieldJoin.opts["dest"]; !ok {
-			return nil, errors.New("A destination field name must be supplied in `dest` for `field_join`.")
+			return nil, errors.New("A destination field name must be supplied in `dest` for `join`.")
 		}
 
 		var source_str string
 		if source_str, ok = filterFieldJoin.opts["source"]; !ok || source_str == "" {
-			return nil, errors.New("At least one field must be supplied in `source` for `field_join`. Multiple fields can be separated by commas.")
+			return nil, errors.New("At least one field must be supplied in `source` for `join`. Multiple fields can be separated by commas.")
 		}
 		filterFieldJoin.source = strings.Split(source_str, ",")
 
