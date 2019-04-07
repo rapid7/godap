@@ -315,7 +315,7 @@ $  echo '{"foo":"bar"}' | godap json + transform foo=base64encode + json
 
   Example:
    ```
-$ echo '{"foo":"baz","bar":"qux"}' | ./godap json + reverse foo bar + json
+$ echo '{"foo":"baz","bar":"qux"}' | godap json + reverse foo bar + json
 {"bar":"xuq","foo":"zab"}
 
    ```
@@ -332,7 +332,7 @@ $ echo '{"foo":"baz","bar":"qux"}' | ./godap json + reverse foo bar + json
 
   Example:
    ```
-$ echo '{"foo":"baz","bar":"qux"}' | ./godap json + join source=foo,bar dest=example sep=# + json
+$ echo '{"foo":"baz","bar":"qux"}' | godap json + join source=foo,bar dest=example sep=# + json
 {"bar":"qux","example":"baz#qux","foo":"baz"}
 
    ```
