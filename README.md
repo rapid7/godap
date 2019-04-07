@@ -319,14 +319,14 @@ $ echo '{"foo":"baz","bar":"qux"}' | godap json + reverse foo bar + json
 {"bar":"xuq","foo":"zab"}
 
    ```
- * <a id="reverse">join</a>
+ * <a id="join">join</a>
 
   Joins one or more source fields into a destination field, separated by a comma. This filter will attempt to cast the source field types to a string representation.
 
   | Option               | Description                   | Value                          | Default                 |
   |----------------------|-------------------------------|--------------------------------|-------------------------|
-  | ```source```         | A comma-separated list of source field names | ```<none>``` | ```<none>``` |
-  | ```dest```           | A destination field which will receive the join result | ```<none>``` | ```<none>``` |
+  | ```source```         | A comma-separated list of source field names | ```<string field name comma separated>``` | ```<none>``` |
+  | ```dest```           | A destination field which will receive the join result | ```<string field name>``` | ```<none>``` |
   | ```sep```            | A separator to join the fields by | ```<string>``` | ```,``` |
 
 
