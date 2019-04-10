@@ -9,6 +9,7 @@ import (
 	_ "github.com/rapid7/godap/output"
 	"log"
 	"os"
+	"os/signal"
 	"regexp"
 	"runtime"
 	"strings"
@@ -93,9 +94,14 @@ func main() {
 
 	numcpu := runtime.NumCPU()
 	runtime.GOMAXPROCS(numcpu)
+	close_input := false
 	inch := make(chan map[string]interface{}, 1000)
 	go func() {
 		for {
+			if close_input {
+				break
+			}
+
 			doc, err := inp.ReadRecord()
 			if err != nil {
 				break
@@ -127,6 +133,20 @@ func main() {
 			}
 		}()
 	}
+
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, os.Interrupt)
+	go func() {
+		for _ = range sigs {
+			// if we've already closed, just exit immediately.
+			if close_input {
+				Console.Println("Received SIGINT, stopping forcefully...")
+				os.Exit(1)
+			}
+			Console.Println("Received SIGINT, stopping...")
+			close_input = true
+		}
+	}()
 
 	var wg2 sync.WaitGroup
 	wg2.Add(1)
