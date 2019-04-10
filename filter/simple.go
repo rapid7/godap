@@ -5,6 +5,8 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/rapid7/godap/api"
 	"github.com/rapid7/godap/factory"
@@ -767,6 +769,94 @@ func init() {
 		filterFieldSplitArray := &FilterFieldSplitArray{}
 		filterFieldSplitArray.ParseOpts(args)
 		return filterFieldSplitArray, nil
+	})
+}
+
+/////////////////////////////////////////////////
+// field string reverse filter
+/////////////////////////////////////////////////
+
+type FilterReverse struct {
+	BaseFilter
+}
+
+func (fs *FilterReverse) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+	for k := range fs.opts {
+		if docv, ok := doc[k]; ok {
+			if val, ok := docv.(string); ok {
+				doc[k] = util.Reverse(val)
+			}
+		}
+	}
+	return []map[string]interface{}{doc}, nil
+}
+
+func init() {
+	factory.RegisterFilter("reverse", func(args []string) (lines api.Filter, err error) {
+		filterReverse := &FilterReverse{}
+		filterReverse.ParseOpts(args)
+		return filterReverse, nil
+	})
+}
+
+/////////////////////////////////////////////////
+// field join filter
+/////////////////////////////////////////////////
+
+type FilterFieldJoin struct {
+	BaseFilter
+	sep    string
+	dest   string
+	source []string
+}
+
+func (fs *FilterFieldJoin) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+	var dest_val string = ""
+	for _, src := range fs.source {
+		if docv, ok := doc[src]; ok {
+			if dest_val != "" {
+				dest_val += fs.sep
+			}
+			switch v := docv.(type) {
+			case string:
+				dest_val += v
+			case int:
+				dest_val += strconv.Itoa(v)
+			case bool:
+				dest_val += strconv.FormatBool(v)
+			case float64:
+				dest_val += strconv.FormatFloat(v, 'E', -1, 64)
+			case json.Number:
+				dest_val += string(v)
+			}
+		}
+	}
+
+	doc[fs.dest] = dest_val
+	return []map[string]interface{}{doc}, nil
+}
+
+func init() {
+	factory.RegisterFilter("join", func(args []string) (lines api.Filter, err error) {
+		filterFieldJoin := &FilterFieldJoin{}
+		filterFieldJoin.ParseOpts(args)
+		var ok bool
+		filterFieldJoin.sep = ","
+		if filterFieldJoin.opts["sep"] != "" {
+			filterFieldJoin.sep = filterFieldJoin.opts["sep"]
+		}
+
+		if filterFieldJoin.dest, ok = filterFieldJoin.opts["dest"]; !ok {
+			return nil, errors.New("A destination field name must be supplied in `dest` for `join`.")
+		}
+
+		var source_str string
+		if source_str, ok = filterFieldJoin.opts["source"]; !ok || source_str == "" {
+			return nil, errors.New("At least one field must be supplied in `source` for `join`. Multiple fields can be separated by commas.")
+		}
+		filterFieldJoin.source = strings.Split(source_str, ",")
+
+		return filterFieldJoin, nil
 	})
 }
 
