@@ -1,5 +1,8 @@
-# GODAP: The Data Analysis Pipeline 
+# GODAP: The Data Analysis Pipeline
 (a port of the ruby-based DAP: https://github.com/rapid7/dap)
+
+[![Gem Version](https://badge.fury.io/rb/godap.svg)](http://badge.fury.io/rb/godap)
+[![Build Status](https://travis-ci.org/rapid7/godap.svg?branch=master)](https://travis-ci.org/rapid7/godap)
 
 DAP was created to transform text-based data on the command-line, specializing in transforms that are annoying or difficult to do with existing tools.
 
@@ -36,7 +39,7 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
 ## Inputs
 
  * <a id="pcap">pcap</a>
-   
+
   Specifies that the input stream is a packet capture. Currently supports streaming in from a file or interface.
 
   | Option  | Description                                                                           | Value               | Default |
@@ -47,20 +50,20 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
   | timeout | The capture timeout                                                                   | integer             | -1 (inf)|
   | snaplen | The snap length                                                                       | integer             | 65536   |
   | rfmon   | Whether to capture in monitor mode (applicable only to adapters which support it)     | boolean             | false   |
-  
+
   Example:
   * Pull packets in from monitor mode: ```godap pcap iface=en0 rfmon=true + json```
   * Read pcap (or pcap-ng) file contents and convert to json: ```godap pcap file=foo.pcap + json```
   * Live capture in promiscuous mode: ```godap pcap iface=en0 promisc=true + json```
 
  * <a id="json">json</a>
- 
+
   Specifies that the input stream is represented as JSON data.
-  
+
   | Option  | Description                                                                           | Value               | Default |
   |---------|---------------------------------------------------------------------------------------|---------------------|---------|
   | file    | The file to stream from. If not specified, stdin is assumed. Can also be - for stdin. | string filename     | stdin   |
-  
+
   Example:
    ```
 $  echo '{"a":2}' | godap json + lines
@@ -70,7 +73,7 @@ $  echo '{"a":2}' | godap json + lines
  * <a id="lines">lines</a>
 
   Specifies that the input stream is represented as newline-terminated plaintext.
-  
+
   | Option  | Description                                                                           | Value               | Default |
   |---------|---------------------------------------------------------------------------------------|---------------------|---------|
   | file    | The file to stream from. If not specified, stdin is assumed. Can also be - for stdin. | string filename     | stdin   |
@@ -83,7 +86,7 @@ $  echo hello world | godap lines + json
 ## Filters
 
  * <a id="rename">rename</a>
-  
+
   Renames a document field.
 
   | Option               | Description                | Value                          | Default |
@@ -96,7 +99,7 @@ $  echo world | godap lines + rename line=hello + json
 {"hello":"world"}
    ```
  * <a id="not_exists">not_exists</a>
-  
+
   Prevents a document from further processing if a specified key is not present
 
   | Option               | Description                | Value                          | Default         |
@@ -108,7 +111,7 @@ $  echo world | godap lines + rename line=hello + json
 $  echo '{"foo":"bar"}' | godap json + not_exists foo + json
 
    ```
-   
+
  * <a id="split_comma">split_comma</a>
 
   Extracts comma-separated fields in the specified key's value into new documents
@@ -123,7 +126,7 @@ $  echo '{"foo":"bar,baz"}' | godap json + split_comma foo + json
 {"foo":"bar,baz","foo.word":"bar"}
 {"foo":"bar,baz","foo.word":"baz"}
    ```
-   
+
  * field_split_line
 
   Extracts fields separated by a newline from the source key's value into new fields of the same document. Each new key is named ```<origkey>.f###``` where ### is an incremental integer indicating the original field position from left to right.
@@ -137,7 +140,7 @@ $  echo '{"foo":"bar,baz"}' | godap json + split_comma foo + json
 $  echo '{"foo":"bar\nbaz"}' | godap json + field_split_line foo + json
 {"foo":"bar\nbaz","foo.f1":"bar","foo.f2":"baz"}
    ```
-   
+
  * <a id="not_empty">not_empty</a>
 
   Filters out a document if the value for a given key is empty
@@ -296,7 +299,7 @@ $  echo '{"foo":"bar", "baz":"qux", "a":"b"}' | godap json + include a=b + json
   | Option               | Description                   | Value                          | Default                 |
   |----------------------|-------------------------------|--------------------------------|-------------------------|
   | ```<document key>``` | The key to transform          | ```utf8encode``` or ```ascii``` or ```base64encode``` or ```base64decode``` or ```upcase``` or ```downcase``` or ```hexencode``` or ```ascii```         | ```<none>```            |
- 
+
 
   Example:
    ```
