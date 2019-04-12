@@ -57,9 +57,8 @@ func (lines *OutputLines) Stop() {
 	lines.Close()
 }
 
-func init() {
-	factory.RegisterOutput("lines", func(args []string) (lines api.Output, err error) {
-		outputLines := &OutputLines{}
+var lines_func =  func(args []string) (lines api.Output, err error) {
+   outputLines := &OutputLines{}
 		var file string
 		outputLines.delimiter = ","
 		outputLines.fields = []string{FIELD_WILDCARD}
@@ -100,5 +99,9 @@ func init() {
 			outputLines.writer.Flush()
 		}
 		return outputLines, nil
-	})
+}
+
+func init() {
+	factory.RegisterOutput("lines", lines_func)
+	factory.RegisterOutput("csv", lines_func)
 }
