@@ -26,7 +26,6 @@ func (fr *FilterRecog) Process(doc map[string]interface{}) (res []map[string]int
 					}
 				}
 			}
-
 		}
 	}
 	return []map[string]interface{}{doc}, nil
