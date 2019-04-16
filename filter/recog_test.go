@@ -1,9 +1,72 @@
 package filter
 
 import (
+	"github.com/rapid7/godap/factory"
 	. "github.com/smartystreets/goconvey/convey"
+	"os"
 	"testing"
 )
+
+func TestRecogFilterFactoryIntegration(t *testing.T) {
+	Convey("When a recog filter is created through the factory", t, func() {
+		filterRecog, err := factory.CreateFilter([]string{"recog", "line=dns.versionbind"})
+
+		Convey("The recog filter should not be nil", func() {
+			So(filterRecog, ShouldNotBeNil)
+		})
+
+		Convey("The error should not be set (nil)", func() {
+			So(err, ShouldBeNil)
+		})
+	})
+
+	Convey("Given the RECOG_DATABASE_PATH set to an invalid path", t, func() {
+		os.Setenv("RECOG_DATABASE_PATH", "/does/not/exist")
+		defer os.Unsetenv("RECOG_DATABASE_PATH")
+
+		Convey("When a recog filter is created", func() {
+			filterRecog, err := factory.CreateFilter([]string{"recog", "line=dns.versionbind"})
+
+			Convey("The recog filter should be nil", func() {
+				So(filterRecog, ShouldBeNil)
+			})
+
+			Convey("The error should indicate the directory does not exist", func() {
+				So(os.IsNotExist(err), ShouldBeTrue)
+			})
+		})
+	})
+}
+
+func TestRecogFilterParameters(t *testing.T) {
+	Convey("Given a recog filter created with a field with no database mapping", t, func() {
+		filterRecog, err := NewFilterRecog(map[string]string{"input": ""}, "")
+
+		Convey("The recog filter should be nil", func() {
+			So(filterRecog, ShouldBeNil)
+		})
+
+		Convey("The error should be set (non-nil)", func() {
+			So(err, ShouldBeError, ErrInvalidMapArgs)
+		})
+	})
+
+	Convey("Given an empty mapping", t, func() {
+		mapping := make(map[string]string)
+
+		Convey("When a new recog filter is created", func() {
+			filterRecog, err := NewFilterRecog(mapping, "")
+
+			Convey("The recog filter should be nil", func() {
+				So(filterRecog, ShouldBeNil)
+			})
+
+			Convey("The error should be set (non-nil)", func() {
+				So(err, ShouldBeError, ErrNoArgs)
+			})
+		})
+	})
+}
 
 func TestRecogFilterProcessingBehavior(t *testing.T) {
 	Convey("Given a recog filter with a nil mapped field map", t, func() {
@@ -14,7 +77,7 @@ func TestRecogFilterProcessingBehavior(t *testing.T) {
 		})
 
 		Convey("The error should be set (non-nil)", func() {
-			So(err, ShouldBeError)
+			So(err, ShouldBeError, ErrNoArgs)
 		})
 	})
 
@@ -62,8 +125,8 @@ func TestRecogFilterDatabaseLoading(t *testing.T) {
 			So(filterRecog, ShouldEqual, nil)
 		})
 
-		Convey("The error returned by NewFilterRecog should be set", func() {
-			So(err, ShouldBeError)
+		Convey("The error returned should indicate the path does not exist", func() {
+			So(os.IsNotExist(err), ShouldBeTrue)
 		})
 	})
 

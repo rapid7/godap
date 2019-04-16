@@ -1,7 +1,6 @@
 package filter
 
 import (
-	"errors"
 	"fmt"
 	recog "github.com/hdm/recog-go/pkg/nition"
 	"github.com/rapid7/godap/api"
@@ -44,8 +43,13 @@ func (fr *FilterRecog) Process(doc map[string]interface{}) (res []map[string]int
 func NewFilterRecog(mapped_fields map[string]string, dbpath string) (filterRecog *FilterRecog, err error) {
 	filterRecog = new(FilterRecog)
 
-	if mapped_fields == nil {
-		return nil, errors.New("Mapped fields must be supplied")
+	if mapped_fields == nil || len(mapped_fields) == 0 {
+		return nil, ErrNoArgs
+	}
+	for k, v := range mapped_fields {
+		if k == "" || v == "" {
+			return nil, ErrInvalidMapArgs
+		}
 	}
 	filterRecog.mapped_fields = mapped_fields
 
@@ -62,13 +66,13 @@ func NewFilterRecog(mapped_fields map[string]string, dbpath string) (filterRecog
 
 // Registers this plugin under the "recog" filter name
 //
-// If the `RECOG_DATABASE_DIRECTORY` environment variable is specified, this plugin
+// If the `RECOG_DATABASE_PATH` environment variable is specified, this plugin
 // will use that directory to load recog content. If it is not specified, it will load
 // content that is embedded in the `recog-go` package.
 func init() {
 	factory.RegisterFilter("recog", func(args []string) (filterRecog api.Filter, err error) {
 		opts := util.ParseOpts(args)
-		filterRecog, err = NewFilterRecog(opts, os.Getenv("RECOG_DATABASE_DIRECTORY"))
+		filterRecog, err = NewFilterRecog(opts, os.Getenv("RECOG_DATABASE_PATH"))
 		return
 	})
 }
