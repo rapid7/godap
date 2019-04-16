@@ -10,6 +10,8 @@ before_install:
  - git clone https://github.com/sstephenson/bats.git
  - cd bats
  - sudo ./install.sh /usr
+ - cd ..
+ - rm -r bats
 
 script: 
   - go test -v ./...
