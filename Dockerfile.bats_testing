@@ -5,7 +5,7 @@ RUN apt-get update
 RUN git clone https://github.com/sstephenson/bats.git && cd bats && ./install.sh /usr
 
 # install godap requirements
-RUN apt-get install -y libpcap0.8-dev libgeoip-dev
+RUN apt-get install -y libpcap0.8-dev libgeoip-dev jq
 
 # build and install godap, but call it *dap* for sake of simplifying testing between dap and godap
 WORKDIR /go/src/dap
