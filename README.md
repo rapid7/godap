@@ -15,11 +15,18 @@ DAP was written to process terabyte-sized public scan datasets, such as those pr
 go get github.com/rapid7/godap
 ```
 
-or, if you'd like to compile with `pcap` filter support (must have libpcap installed):
+godap supports `pcap` and `geoip`, which provide an input and filters, respectively. To enable support for these,
+you must pass a `libpcap` or `libgeoip` tag to your `go get` command. You must also have those libraries installed on your system
+(libpcap-dev or libgeoip).
+
+For example:
 
 ```
-go get -tags="libpcap" github.com/rapid7/godap
+go get -tags="libpcap libgeoip" github.com/rapid7/godap
 ```
+
+Will compile in support for both the `pcap` input and the `geoip` filters (`geo_ip` and `geo_ip_org`)
+
 
 ## Usage
 
