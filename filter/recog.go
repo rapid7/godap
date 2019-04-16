@@ -6,6 +6,7 @@ import (
 	"github.com/rapid7/godap/api"
 	"github.com/rapid7/godap/factory"
 	"github.com/rapid7/godap/util"
+	"os"
 )
 
 type FilterRecog struct {
@@ -31,17 +32,38 @@ func (fr *FilterRecog) Process(doc map[string]interface{}) (res []map[string]int
 	return []map[string]interface{}{doc}, nil
 }
 
-func NewFilterRecog(mapped_fields map[string]string) *FilterRecog {
-	filterRecog := new(FilterRecog)
+// Returns a new recog filter, given the specified `mapped_fields` and database path.
+//
+// The `mapped_fields` map keys should indicate fields in the source document, and values
+// the recog database name to match against.
+//
+// The `dbpath` can specify an optional directory to recog database files (.xml). If
+// not specified, or set to the empty string, a filter will be created based on the content
+// embedded in the recog-go package.
+func NewFilterRecog(mapped_fields map[string]string, dbpath string) (filterRecog *FilterRecog, err error) {
+	filterRecog = new(FilterRecog)
 	filterRecog.mapped_fields = mapped_fields
-	filterRecog.nizer = recog.MustLoadFingerprints()
-	return filterRecog
+
+	if dbpath == "" {
+		filterRecog.nizer = recog.MustLoadFingerprints()
+	} else {
+		if filterRecog.nizer, err = recog.LoadFingerprintsDir(dbpath); err != nil {
+			filterRecog = nil
+		}
+	}
+
+	return
 }
 
+// Registers this plugin under the "recog" filter name
+//
+// If the `RECOG_DATABASE_DIRECTORY` environment variable is specified, this plugin
+// will use that directory to load recog content. If it is not specified, it will load
+// content that is embedded in the `recog-go` package.
 func init() {
-	factory.RegisterFilter("recog", func(args []string) (lines api.Filter, err error) {
+	factory.RegisterFilter("recog", func(args []string) (filterRecog api.Filter, err error) {
 		opts := util.ParseOpts(args)
-		filterRecog := NewFilterRecog(opts)
-		return filterRecog, nil
+		filterRecog, err = NewFilterRecog(opts, os.Getenv("RECOG_DATABASE_DIRECTORY"))
+		return
 	})
 }
