@@ -338,6 +338,20 @@ $ echo '{"foo":"baz","bar":"qux"}' | godap json + join source=foo,bar dest=examp
 {"bar":"qux","example":"baz#qux","foo":"baz"}
 
    ```
+ * <a id="recog">recog</a>
+
+  Runs an input field through a given database, adding [recog](https://github.com/rapid7/recog) match fields to the input document.
+
+  | Option               | Description                   | Value                          | Default                 |
+  |----------------------|-------------------------------|--------------------------------|-------------------------|
+  | ```<field_name>=<database_name>``` | one or more space separated pairs of a field name "=" a recog database name (the name from the recog xml `matches` attribute) | ```<string field name "=" string database name, space separated>``` | ```<none>``` |
+
+
+  Example:
+   ```
+$ echo "9.8.2rc1-RedHat-9.8.2-0.62.rc1.el6_9.2" | godap lines + recog line=dns.versionbind + json
+{"line":"9.8.2rc1-RedHat-9.8.2-0.62.rc1.el6_9.2","line.recog.os.cpe23":"cpe:/o:redhat:enterprise_linux:6","line.recog.os.family":"Linux","line.recog.os.product":"Enterprise Linux","line.recog.os.vendor":"Red Hat","line.recog.os.version":"6","line.recog.os.version.version":"9","line.recog.service.cpe23":"cpe:/a:isc:bind:9.8.2rc1","line.recog.service.family":"BIND","line.recog.service.product":"BIND","line.recog.service.vendor":"ISC","line.recog.service.version":"9.8.2rc1"}
+   ```
  * <a id="field_array_join_whitespace">field_array_join_whitespace</a>
  * <a id="digest">digest</a>
  * <a id="geo_ip">geo_ip</a>
