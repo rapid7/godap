@@ -1,3 +1,5 @@
+// +build libgeoip
+
 package filter
 
 import (
