@@ -1,8 +1,11 @@
-language: generic
+language: go
 
-services:
-  - docker
+go:
+  - 1.10
 
 before_install:
-  - docker build -t godap-bats -f Dockerfile.bats_testing .
-  - docker run godap-bats
+ - git clone https://github.com/sstephenson/bats.git
+ - cd bats
+ - ./install.sh /usr
+
+script: go test -v ./... && find . -name \*.bats | grep -v test/test_helper/ | xargs -n1 bats
