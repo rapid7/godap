@@ -11,7 +11,7 @@ before_install:
  - cd bats
  - sudo ./install.sh /usr
  - cd ..
- - rm -r bats
+ - sudo rm -r bats
 
 script: 
   - go test -v ./...
