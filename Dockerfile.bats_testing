@@ -13,5 +13,8 @@ COPY . .
 RUN go get -d -v ./...
 RUN go install -v ./...
 
+# set default dap command
+ENV DAP_EXECUTABLE=dap
+
 # find and run all .bats files
 ENTRYPOINT /bin/bash -c "find . -name \*.bats | grep -v test/test_helper/ | xargs -n1 bats"
