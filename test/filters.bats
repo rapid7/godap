@@ -105,3 +105,20 @@ load ./test_common
   assert_success
   assert_output '{"foo":"YmFy"}'
 }
+
+@test "recog_match" {
+  run bash -c "echo '9.8.2rc1-RedHat-9.8.2-0.62.rc1.el6_9.2' | $DAP_EXECUTABLE lines + recog line=dns.versionbind + json | jq -Sc ."
+  assert_success
+  assert_output '{"line":"9.8.2rc1-RedHat-9.8.2-0.62.rc1.el6_9.2","line.recog.os.cpe23":"cpe:/o:redhat:enterprise_linux:6","line.recog.os.family":"Linux","line.recog.os.product":"Enterprise Linux","line.recog.os.vendor":"Red Hat","line.recog.os.version":"6","line.recog.os.version.version":"9","line.recog.service.cpe23":"cpe:/a:isc:bind:9.8.2rc1","line.recog.service.family":"BIND","line.recog.service.product":"BIND","line.recog.service.vendor":"ISC","line.recog.service.version":"9.8.2rc1"}'
+}
+
+@test "recog_nomatch" {
+  run bash -c "echo 'should not match' | $DAP_EXECUTABLE lines + recog line=dns.versionbind + json | jq -Sc ."
+  assert_success
+  assert_output '{"line":"should not match"}'
+}
+
+@test "recog_invalid_arg" {
+  run bash -c "echo 'test' | $DAP_EXECUTABLE lines + recog + json"
+  assert_failure
+}
