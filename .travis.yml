@@ -7,6 +7,7 @@ env:
   - DAP_EXECUTABLE=godap
 
 before_install:
+ - sudo apt-get install libpcap0.8-dev libgeoip-dev
  - git clone https://github.com/sstephenson/bats.git
  - cd bats
  - sudo ./install.sh /usr
