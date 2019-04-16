@@ -16,6 +16,10 @@ func TestRecogFilterProcessingBehavior(t *testing.T) {
 				"input": "9.8.2rc1-RedHat-9.8.2-0.62.rc1.el6_9.2",
 			})
 
+			Convey("There should only be one document", func() {
+				So(result, ShouldHaveLength, 1)
+			})
+
 			Convey("The document should contain recog fields", func() {
 				So(result[0]["input.recog.service.product"], ShouldEqual, "BIND")
 			})
