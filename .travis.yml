@@ -5,4 +5,4 @@ services:
 
 before_install:
   - docker build -t godap-bats -f Dockerfile.bats_testing .
-  - docker run godap-bats
+  - docker run -e DAP_EXECUTABLE=dap godap-bats
