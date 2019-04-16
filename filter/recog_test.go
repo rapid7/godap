@@ -6,6 +6,18 @@ import (
 )
 
 func TestRecogFilterProcessingBehavior(t *testing.T) {
+	Convey("Given a recog filter with a nil mapped field map", t, func() {
+		filterRecog, err := NewFilterRecog(nil, "")
+
+		Convey("The recog filter should be nil", func() {
+			So(filterRecog, ShouldBeNil)
+		})
+
+		Convey("The error should be set (non-nil)", func() {
+			So(err, ShouldBeError)
+		})
+	})
+
 	Convey("Given a recog filter with a mapped field of \"input\" to dns.versionbind", t, func() {
 		filterRecog, _ := NewFilterRecog(map[string]string{
 			"input": "dns.versionbind",
