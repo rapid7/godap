@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"errors"
 	"fmt"
 	recog "github.com/hdm/recog-go/pkg/nition"
 	"github.com/rapid7/godap/api"
@@ -42,6 +43,10 @@ func (fr *FilterRecog) Process(doc map[string]interface{}) (res []map[string]int
 // embedded in the recog-go package.
 func NewFilterRecog(mapped_fields map[string]string, dbpath string) (filterRecog *FilterRecog, err error) {
 	filterRecog = new(FilterRecog)
+
+	if mapped_fields == nil {
+		return nil, errors.New("Mapped fields must be supplied")
+	}
 	filterRecog.mapped_fields = mapped_fields
 
 	if dbpath == "" {
