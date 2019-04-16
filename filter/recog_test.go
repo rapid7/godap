@@ -26,12 +26,17 @@ func TestRecogFilterProcessingBehavior(t *testing.T) {
 		})
 
 		Convey("When we process an input doc with no keys matching the filter's mapped fields", func() {
-			result, _ := filterRecog.Process(map[string]interface{}{
+			match_fields := map[string]interface{}{
 				"unmatched_field": "9.8.2rc1-RedHat-9.8.2-0.62.rc1.el6_9.2",
+			}
+			result, _ := filterRecog.Process(match_fields)
+
+			Convey("There should be only one result document", func() {
+				So(result, ShouldHaveLength, 1)
 			})
 
-			Convey("There should be no recog fields in the result document", func() {
-				So(result[0]["input.recog.service.product"], ShouldEqual, nil)
+			Convey("The result document should equal the input document", func() {
+				So(result[0], ShouldResemble, match_fields)
 			})
 		})
 	})
@@ -57,7 +62,7 @@ func TestRecogFilterDatabaseLoading(t *testing.T) {
 			So(filterRecog, ShouldNotBeNil)
 		})
 
-		Convey("The error returned by NewFilterRecog should be nil", func() {
+		Convey("The error returned by NewFilterRecog should be unset (nil)", func() {
 			So(err, ShouldBeNil)
 		})
 	})
