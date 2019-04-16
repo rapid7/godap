@@ -2,10 +2,17 @@ If you'd like to contribute, please fork this repository and publish PRs for rev
 
 # Testing
 
-[bats](https://github.com/sstephenson/bats) is currently used to run functional
-tests that exercise tests for `godap`.  [travis-ci](https://travis-ci.com) will
-automatically run all `bats` tests defined in this project upon each PR.  You
-are encouraged to add tests as you add/convert functionality.
+There are two testing frameworks in place.
+
+Code-level tests are required, and must be written in [goconvey](https://github.com/smartystreets/goconvey).
+This library allows behavior-driven development and testing. It is also compatible with standard golaing 
+`testing.T`.
+
+
+Additionally, [bats](https://github.com/sstephenson/bats) is currently used to run integration
+tests.  [travis-ci](https://travis-ci.com) will automatically run all `bats` tests defined in this project 
+upon each PR.  You are encouraged to add tests as you add/convert functionality from ruby-based dap to make
+the port easier.
 
 To run tests outside of travis-ci:
 
