@@ -1,11 +1,16 @@
 language: go
 
 go:
-  - 1.10
+  - 1.10.x
+
+env:
+  - DAP_EXECUTABLE=godap
 
 before_install:
  - git clone https://github.com/sstephenson/bats.git
  - cd bats
  - ./install.sh /usr
 
-script: go test -v ./... && find . -name \*.bats | grep -v test/test_helper/ | xargs -n1 bats
+script: 
+  - go test -v ./...
+  - find . -name \*.bats | grep -v test/test_helper/ | xargs -n1 bats
