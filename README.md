@@ -9,6 +9,18 @@ DAP reads data using an input plugin, transforms it through a series of filters,
 
 DAP was written to process terabyte-sized public scan datasets, such as those provided by https://opendata.rapid7.com/. This go version of dap supports parallel processing of data. Results are forwarded to stdout and consistency of ordering is not guaranteed (and are highly likely to be out of order when compared to the input data stream).
 
+## Installation
+
+```
+go get github.com/rapid7/godap
+```
+
+or, if you'd like to compile with `pcap` filter support (must have libpcap installed):
+
+```
+go get -tags="libpcap" github.com/rapid7/godap
+```
+
 ## Usage
 
 ### Quick Setup for GeoIP Lookups
@@ -40,6 +52,8 @@ The general syntax when calling godap is ```godap <input> + (<filter +> <filter 
  * <a id="pcap">pcap</a>
 
   Specifies that the input stream is a packet capture. Currently supports streaming in from a file or interface.
+
+  NOTE: godap MUST be built using `-tags="libpcap"` for pcap filter support. If not, the pcap filter will be unavailable.
 
   | Option  | Description                                                                           | Value               | Default |
   |---------|---------------------------------------------------------------------------------------|---------------------|---------|

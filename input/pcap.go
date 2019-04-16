@@ -1,3 +1,5 @@
+// +build libpcap
+
 package input
 
 import (
