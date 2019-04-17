@@ -12,6 +12,7 @@ import (
 	"os/signal"
 	"regexp"
 	"runtime"
+	"sort"
 	"strings"
 	"sync"
 )
@@ -188,7 +189,9 @@ func version(Console *log.Logger) {
 
 func show_inputs(console *log.Logger) {
 	console.Println("Inputs:")
-	for _, k := range factory.Inputs() {
+	inputs := factory.Inputs()
+	sort.Strings(inputs)
+	for _, k := range inputs {
 		console.Printf(" * %s", k)
 	}
 	os.Exit(1)
@@ -196,7 +199,9 @@ func show_inputs(console *log.Logger) {
 
 func show_outputs(console *log.Logger) {
 	console.Println("Outputs:")
-	for _, k := range factory.Outputs() {
+	outputs := factory.Outputs()
+	sort.Strings(outputs)
+	for _, k := range outputs {
 		console.Printf(" * %s", k)
 	}
 	os.Exit(1)
@@ -204,7 +209,9 @@ func show_outputs(console *log.Logger) {
 
 func show_filters(console *log.Logger) {
 	console.Println("Filters:")
-	for _, k := range factory.Filters() {
+	filters := factory.Filters()
+	sort.Strings(filters)
+	for _, k := range filters {
 		console.Printf(" * %s", k)
 	}
 	os.Exit(1)
