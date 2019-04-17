@@ -8,14 +8,6 @@ RUN git clone https://github.com/sstephenson/bats.git && cd bats && ./install.sh
 RUN apt-get install -y libpcap0.8-dev libgeoip-dev jq
 
 # build and install godap, but call it *dap* for sake of simplifying testing between dap and godap
-ENV GOPATH=/go
-WORKDIR $GOPATH/src/github.com/rapid7/godap
+WORKDIR /opt/godap
 COPY . .
-RUN go get -d -v -tags="libpcap libgeoip" ./...
-RUN go install -v -tags="libpcap libgeoip" ./...
-
-# set default dap command
-ENV DAP_EXECUTABLE=godap
-
-# find and run all .bats files
-ENTRYPOINT /bin/bash -c "find . -name \*.bats | grep -v test/test_helper/ | xargs -n1 bats"
+RUN go install -v -tags="libpcap libgeoip"
