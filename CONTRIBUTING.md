@@ -17,5 +17,5 @@ the port easier.
 To run tests outside of travis-ci:
 
 ```
-docker build -t godap_bats -f Dockerfile.bats_testing . &&  docker run --rm -it --name godap_bats -v "$PWD":/opt/bats_testing godap_bats
+docker build -t godap_bats -f Dockerfile.testing . && docker run --rm --name godap_bats -it -e DAP_EXECUTABLE=godap godap_bats /bin/bash -c "go test -v ./... && find . -name \*.bats | grep -v test/test_helper/ | xargs -n1 bats"
 ```
