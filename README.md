@@ -10,6 +10,7 @@ DAP reads data using an input plugin, transforms it through a series of filters,
 DAP was written to process terabyte-sized public scan datasets, such as those provided by https://opendata.rapid7.com/. This go version of dap supports parallel processing of data. Results are forwarded to stdout and consistency of ordering is not guaranteed (and are highly likely to be out of order when compared to the input data stream).
 
 ## Installation
+Install Go version 1.12 or higher.
 
 ```
 go get github.com/rapid7/godap
