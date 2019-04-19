@@ -9,7 +9,7 @@ import (
 )
 
 type GeoIPNoopDecoder struct {
-	Decoder
+	GeoIPDecoder
 }
 
 func (g *GeoIPNoopDecoder) decode(db *geoip.GeoIP, ip string, field string, doc map[string]interface{}) {
@@ -57,7 +57,7 @@ func TestNewGeoIP(t *testing.T) {
 
 	Convey("Given a nil decoder", t, func() {
 		fields := []string{"nop"}
-		var decoder Decoder = nil
+		var decoder GeoIPDecoder = nil
 		geoip_path := "../test/test_data/geoip/GeoIPCity.dat"
 		default_database_files := make([]string, 0)
 

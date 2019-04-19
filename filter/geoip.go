@@ -10,13 +10,13 @@ import (
 	"os"
 )
 
-type Decoder interface {
+type GeoIPDecoder interface {
 	decode(db *geoip.GeoIP, ip string, field string, doc map[string]interface{})
 }
 
 type FilterGeoIP struct {
 	api.Filter
-	decoder Decoder
+	decoder GeoIPDecoder
 	db      *geoip.GeoIP
 	fields  []string
 }
@@ -30,7 +30,7 @@ func (filterGeoIP *FilterGeoIP) Process(doc map[string]interface{}) (res []map[s
 	return []map[string]interface{}{doc}, nil
 }
 
-func NewFilterGeoIP(fields []string, geoip_path string, default_database_files []string, decoder Decoder) (filterGeoIP *FilterGeoIP, err error) {
+func NewFilterGeoIP(fields []string, geoip_path string, default_database_files []string, decoder GeoIPDecoder) (filterGeoIP *FilterGeoIP, err error) {
 	filterGeoIP = new(FilterGeoIP)
 	filterGeoIP.fields = fields
 
@@ -64,7 +64,7 @@ func NewFilterGeoIP(fields []string, geoip_path string, default_database_files [
 }
 
 type GeoIPCityDecoder struct {
-	Decoder
+	GeoIPDecoder
 }
 
 func (g *GeoIPCityDecoder) decode(db *geoip.GeoIP, ip string, field string, doc map[string]interface{}) {
@@ -96,7 +96,7 @@ func init() {
 }
 
 type GeoIPOrgDecoder struct {
-	Decoder
+	GeoIPDecoder
 }
 
 func (g *GeoIPOrgDecoder) decode(db *geoip.GeoIP, ip string, field string, doc map[string]interface{}) {
