@@ -54,6 +54,25 @@ func TestNewGeoIP(t *testing.T) {
 			})
 		})
 	})
+
+	Convey("Given a nil decoder", t, func() {
+		fields := []string{"nop"}
+		var decoder Decoder = nil
+		geoip_path := "../test/test_data/geoip/GeoIPCity.dat"
+		default_database_files := make([]string, 0)
+
+		Convey("When a new geo_ip filter is created", func() {
+			filter, err := NewFilterGeoIP(fields, geoip_path, default_database_files, decoder)
+
+			Convey("An error is returned indicating the decoder was nil", func() {
+				So(err, ShouldBeError)
+			})
+
+			Convey("The filter returned was nil", func() {
+				So(filter, ShouldBeNil)
+			})
+		})
+	})
 }
 
 func TestGeoIPCityDecoder(t *testing.T) {
@@ -143,6 +162,25 @@ func TestGeoIPCityFilterFactoryIntegration(t *testing.T) {
 
 			Convey("The error should indicate the directory does not exist", func() {
 				So(os.IsNotExist(err), ShouldBeTrue)
+			})
+		})
+	})
+}
+
+func TestGeoIPOrgDecoder(t *testing.T) {
+	Convey("Given an input ip address and geoip org database", t, func() {
+		ip := "12.87.118.0" // test address in the GeoIPOrg.dat test database
+		decoder := new(GeoIPOrgDecoder)
+		database, _ := geoip.Open("../test/test_data/geoip/GeoIPOrg.dat")
+
+		Convey("When the IP is processed by the decoder", func() {
+			result := make(map[string]interface{})
+			decoder.decode(database, ip, "line", result)
+
+			Convey("The result should have expected geo_ip_org fields", func() {
+				So(result, ShouldResemble, map[string]interface{}{
+					"line.org": "AT&T Worldnet Services",
+				})
 			})
 		})
 	})
