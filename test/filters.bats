@@ -122,3 +122,15 @@ load ./test_common
   run bash -c "echo 'test' | $DAP_EXECUTABLE lines + recog + json"
   assert_failure
 }
+
+@test "geo_ip yields valid fields" {
+  run bash -c "echo 66.92.181.240 | GEOIP_CITY_DATABASE_PATH=./test/test_data/geoip/GeoIPCity.dat $DAP_EXECUTABLE lines + geo_ip line + json | jq -Sc ."
+  assert_success
+  assert_output '{"line":"66.92.181.240","line.area_code":510,"line.city":"Fremont","line.continent_code":"NA","line.country_code":"US","line.country_code3":"USA","line.country_name":"United States","line.dma_code":807,"line.latitude":37.5079,"line.longitude":-121.96,"line.postal_code":"94538","line.region":"CA"}'
+}
+
+@test "geo_ip_org yields valid fields" {
+  run bash -c "echo 12.87.118.0 | GEOIP_ORG_DATABASE_PATH=./test/test_data/geoip/GeoIPOrg.dat $DAP_EXECUTABLE lines + geo_ip_org line + json | jq -Sc -r ."
+  assert_success
+  assert_output '{"line":"12.87.118.0","line.org":"AT&T Worldnet Services"}'
+}
