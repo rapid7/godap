@@ -1,34 +1,74 @@
-// +build libgeoip
-
 package filter
 
 import (
+	"errors"
 	"fmt"
 	"github.com/abh/geoip"
 	"github.com/rapid7/godap/api"
 	"github.com/rapid7/godap/factory"
+	"github.com/rapid7/godap/util"
+	"os"
 )
 
-/////////////////////////////////////////////////
-// geo_ip filter
-/////////////////////////////////////////////////
-
-type FilterGeoIP struct {
-	BaseFilter
-	db *geoip.GeoIP
+type Decoder interface {
+	decode(db *geoip.GeoIP, ip string, field string, doc map[string]interface{})
 }
 
-func (b *FilterGeoIP) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
-	for k := range b.opts {
+type FilterGeoIP struct {
+	api.Filter
+	decoder Decoder
+	db      *geoip.GeoIP
+	fields  []string
+}
+
+func (filterGeoIP *FilterGeoIP) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+	for _, k := range filterGeoIP.fields {
 		if docv, ok := doc[k]; ok {
-			b.Decode(docv.(string), k, doc)
+			filterGeoIP.decoder.decode(filterGeoIP.db, docv.(string), k, doc)
 		}
 	}
 	return []map[string]interface{}{doc}, nil
 }
 
-func (f *FilterGeoIP) Decode(ip string, field string, doc map[string]interface{}) {
-	record := f.db.GetRecord(ip)
+func NewFilterGeoIP(fields []string, geoip_path string, default_database_files []string, decoder Decoder) (filterGeoIP *FilterGeoIP, err error) {
+	filterGeoIP = new(FilterGeoIP)
+	filterGeoIP.fields = fields
+
+	if decoder == nil {
+		return nil, errors.New("Nil Geo IP decoder specified")
+	}
+	filterGeoIP.decoder = decoder
+
+	if len(fields) == 0 {
+		return nil, ErrNoArgs
+	}
+
+	stat, err := os.Stat(geoip_path)
+	if err != nil {
+		return nil, err
+	}
+
+	switch mode := stat.Mode(); {
+	case mode.IsDir():
+		for _, file := range default_database_files {
+			filterGeoIP.db, err = geoip.Open(fmt.Sprintf("%s/%s", geoip_path, file))
+			if err == nil {
+				break
+			}
+		}
+	case mode.IsRegular():
+		filterGeoIP.db, err = geoip.Open(geoip_path)
+	}
+
+	return
+}
+
+type GeoIPCityDecoder struct {
+	Decoder
+}
+
+func (g *GeoIPCityDecoder) decode(db *geoip.GeoIP, ip string, field string, doc map[string]interface{}) {
+	record := db.GetRecord(ip)
 	if record != nil {
 		doc[fmt.Sprintf("%s.country_code", field)] = record.CountryCode
 		doc[fmt.Sprintf("%s.country_code3", field)] = record.CountryCode3
@@ -45,62 +85,34 @@ func (f *FilterGeoIP) Decode(ip string, field string, doc map[string]interface{}
 }
 
 func init() {
-	factory.RegisterFilter("geo_ip", func(args []string) (geoIp api.Filter, err error) {
-		filterGeoIP := &FilterGeoIP{}
-		filterGeoIP.ParseOpts(args)
-		for _, file := range []string{"geoip.dat", "geoip_city.dat", "GeoCity.dat", "IP_V4_CITY.dat", "GeoCityLite.dat"} {
-			filterGeoIP.db, err = geoip.Open(fmt.Sprintf("%s/%s", "/var/lib/geoip", file))
-			if err == nil {
-				break
-			}
-		}
-		if filterGeoIP == nil {
-			err = fmt.Errorf("Could not open geoip database")
-			return nil, err
-		}
-		return filterGeoIP, nil
+	factory.RegisterFilter("geo_ip", func(args []string) (filterGeoIPCity api.Filter, err error) {
+		filterGeoIPCity, err = NewFilterGeoIP(
+			args,
+			util.GetEnv("GEOIP_CITY_DATABASE_PATH", "/var/lib/geoip"),
+			[]string{"geoip.dat", "geoip_city.dat", "GeoCity.dat", "IP_V4_CITY.dat", "GeoCityLite.dat"},
+			new(GeoIPCityDecoder))
+		return
 	})
 }
 
-/////////////////////////////////////////////////
-// geo_ip_org filter
-/////////////////////////////////////////////////
-
-type FilterGeoIPOrg struct {
-	BaseFilter
-	db *geoip.GeoIP
+type GeoIPOrgDecoder struct {
+	Decoder
 }
 
-func (b *FilterGeoIPOrg) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
-	for k := range b.opts {
-		if docv, ok := doc[k]; ok {
-			b.Decode(docv.(string), k, doc)
-		}
-	}
-	return []map[string]interface{}{doc}, nil
-}
-
-func (f *FilterGeoIPOrg) Decode(ip string, field string, doc map[string]interface{}) {
-	record := f.db.GetOrg(ip)
+func (g *GeoIPOrgDecoder) decode(db *geoip.GeoIP, ip string, field string, doc map[string]interface{}) {
+	record := db.GetOrg(ip)
 	if record != "" {
 		doc[fmt.Sprintf("%s.org", field)] = record
 	}
 }
 
 func init() {
-	factory.RegisterFilter("geo_ip_org", func(args []string) (geoIpOrg api.Filter, err error) {
-		filterGeoIPOrg := &FilterGeoIPOrg{}
-		filterGeoIPOrg.ParseOpts(args)
-		for _, file := range []string{"geoip_org.dat", "IP_V4_ORG.dat"} {
-			filterGeoIPOrg.db, err = geoip.Open(fmt.Sprintf("%s/%s", "/var/lib/geoip", file))
-			if err == nil {
-				break
-			}
-		}
-		if filterGeoIPOrg == nil {
-			err = fmt.Errorf("Could not open geoip org database")
-			return nil, err
-		}
-		return filterGeoIPOrg, nil
+	factory.RegisterFilter("geo_ip_org", func(args []string) (filterGeoIPOrg api.Filter, err error) {
+		filterGeoIPOrg, err = NewFilterGeoIP(
+			args,
+			util.GetEnv("GEOIP_ORG_DATABASE_PATH", "/var/lib/geoip"),
+			[]string{"geoip_org.dat", "IP_V4_ORG.dat"},
+			new(GeoIPOrgDecoder))
+		return
 	})
 }
