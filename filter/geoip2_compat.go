@@ -22,7 +22,7 @@ func (g *GeoIP2LegacyCompatDecoder) decode(ip string, field string, doc map[stri
 		doc[fmt.Sprintf("%s.country_name", field)] = v
 	}
 
-	if v, ok := doc[fmt.Sprintf("%s.geoip2.location.metro_code", field)]; ok {
+	if v, ok := doc[fmt.Sprintf("%s.geoip2.location.metro_code", field)]; ok && v.(uint) > 0 {
 		doc[fmt.Sprintf("%s.dma_code", field)] = v
 	}
 
@@ -30,7 +30,7 @@ func (g *GeoIP2LegacyCompatDecoder) decode(ip string, field string, doc map[stri
 	// https://dev.maxmind.com/geoip/geoip2/whats-new-in-geoip2/#Area_Code
 	// doc[fmt.Sprintf("%s.area_code", field)] = record.AreaCode
 
-	if v, ok := doc[fmt.Sprintf("%s.geoip2.postal.code", field)]; ok {
+	if v, ok := doc[fmt.Sprintf("%s.geoip2.postal.code", field)]; ok && v != "" {
 		doc[fmt.Sprintf("%s.postal_code", field)] = v
 	}
 
@@ -42,7 +42,7 @@ func (g *GeoIP2LegacyCompatDecoder) decode(ip string, field string, doc map[stri
 		doc[fmt.Sprintf("%s.longitude", field)] = v
 	}
 
-	if v, ok := doc[fmt.Sprintf("%s.geoip2.city.name", field)]; ok {
+	if v, ok := doc[fmt.Sprintf("%s.geoip2.city.name", field)]; ok && v != "" {
 		doc[fmt.Sprintf("%s.city", field)] = v
 	}
 
