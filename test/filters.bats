@@ -134,3 +134,15 @@ load ./test_common
   assert_success
   assert_output '{"line":"12.87.118.0","line.org":"AT&T Worldnet Services"}'
 }
+
+@test "geo_ip2_city yields valid fields" {
+  run bash -c "echo 81.2.69.142 | GEOIP2_LANGUAGE=en GEOIP2_CITY_DATABASE_PATH=./test/test_data/geoip2/GeoIP2-City-Test.mmdb ./godap lines + geo_ip2_city line + json | jq -Sc ."
+  assert_success
+  assert_output '{"line":"81.2.69.142","line.geoip2.city.geoname_id":2643743,"line.geoip2.city.name":"London","line.geoip2.continent.code":"EU","line.geoip2.continent.geoname_id":6255148,"line.geoip2.continent.name":"Europe","line.geoip2.country.geoname_id":2635167,"line.geoip2.country.is_eu":true,"line.geoip2.country.iso_code":"GB","line.geoip2.country.name":"United Kingdom","line.geoip2.location.accuracy_raidus":10,"line.geoip2.location.latitude":51.5142,"line.geoip2.location.longitude":-0.0931,"line.geoip2.location.metro_code":0,"line.geoip2.location.time_zone":"Europe/London","line.geoip2.postal.code":"","line.geoip2.registered_country.geoname_id":6252001,"line.geoip2.registered_country.is_eu":false,"line.geoip2.registered_country.iso_code":"US","line.geoip2.registered_country.name":"United States","line.geoip2.represented_country.geoname_id":0,"line.geoip2.represented_country.is_eu":false,"line.geoip2.represented_country.iso_code":"","line.geoip2.represented_country.name":"","line.geoip2.represented_country.type":"","line.geoip2.subdivisions.0.geoname_id":6269131,"line.geoip2.subdivisions.0.iso_code":"ENG","line.geoip2.subdivisions.0.name":"England","line.geoip2.subdivisions.length":1,"line.geoip2.traits.is_anon_proxy":false,"line.geoip2.traits.is_satellite":false}'
+}
+
+@test "geo_ip2_isp yields valid fields" {
+  run bash -c "echo 1.128.0.0 | GEOIP2_LANGUAGE=en GEOIP2_ISP_DATABASE_PATH=./test/test_data/geoip2/GeoIP2-ISP-Test.mmdb $DAP_EXECUTABLE lines + geo_ip2_isp line + json | jq -Sc ."
+  assert_success
+  assert_output '{"line":"1.128.0.0","line.geoip2.isp.asn":1221,"line.geoip2.isp.asn_org":"Telstra Pty Ltd","line.geoip2.isp.isp":"Telstra Internet","line.geoip2.isp.org":"Telstra Internet"}'
+}
