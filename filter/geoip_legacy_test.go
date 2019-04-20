@@ -38,17 +38,17 @@ func TestGeoIPCityDecoder(t *testing.T) {
 
 			Convey("The result should have expected geo_ip fields", func() {
 				So(result, ShouldResemble, map[string]interface{}{
-					"line.country_code":   "US",
-					"line.country_code3":  "USA",
-					"line.country_name":   "United States",
-					"line.continent_code": "NA",
-					"line.region":         "CA",
-					"line.city":           "Fremont",
-					"line.postal_code":    "94538",
-					"line.latitude":       float32(37.5079),
-					"line.longitude":      float32(-121.96),
-					"line.dma_code":       807,
-					"line.area_code":      510,
+					"line.country_code":  "US",
+					"line.country_code3": "USA",
+					"line.country_name":  "United States",
+					"line.region":        "CA",
+					"line.region_name":   "",
+					"line.city":          "Fremont",
+					"line.postal_code":   "94538",
+					"line.latitude":      float32(37.5079),
+					"line.longitude":     float32(-121.96),
+					"line.dma_code":      807,
+					"line.area_code":     510,
 				})
 			})
 		})
@@ -79,18 +79,18 @@ func TestGeoIPCityFilterFactoryIntegration(t *testing.T) {
 
 			Convey("The first item in the result should have expected geo_ip fields", func() {
 				So(result[0], ShouldResemble, map[string]interface{}{
-					"line":                "66.92.181.240",
-					"line.country_code":   "US",
-					"line.country_code3":  "USA",
-					"line.country_name":   "United States",
-					"line.continent_code": "NA",
-					"line.region":         "CA",
-					"line.city":           "Fremont",
-					"line.postal_code":    "94538",
-					"line.latitude":       float32(37.5079),
-					"line.longitude":      float32(-121.96),
-					"line.dma_code":       807,
-					"line.area_code":      510,
+					"line":               "66.92.181.240",
+					"line.country_code":  "US",
+					"line.country_code3": "USA",
+					"line.country_name":  "United States",
+					"line.region":        "CA",
+					"line.region_name":   "",
+					"line.city":          "Fremont",
+					"line.postal_code":   "94538",
+					"line.latitude":      float32(37.5079),
+					"line.longitude":     float32(-121.96),
+					"line.dma_code":      807,
+					"line.area_code":     510,
 				})
 			})
 
