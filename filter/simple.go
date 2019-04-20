@@ -99,6 +99,43 @@ func init() {
 }
 
 /////////////////////////////////////////////////
+// remove_prefix filter
+/////////////////////////////////////////////////
+
+type FilterRemovePrefix struct {
+	api.Filter
+	prefixes []string
+}
+
+func (fs *FilterRemovePrefix) Process(doc map[string]interface{}) (res []map[string]interface{}, err error) {
+	for _, prefix := range fs.prefixes {
+		for k, _ := range doc {
+			if strings.HasPrefix(k, prefix) {
+				delete(doc, k)
+			}
+		}
+	}
+	return []map[string]interface{}{doc}, nil
+}
+
+func NewFilterRemovePrefix(prefixes []string) (*FilterRemovePrefix, error) {
+	filterRemovePrefix := new(FilterRemovePrefix)
+
+	if prefixes == nil || len(prefixes) < 1 {
+		return nil, ErrNoArgs
+	}
+	filterRemovePrefix.prefixes = prefixes
+
+	return filterRemovePrefix, nil
+}
+
+func init() {
+	factory.RegisterFilter("remove_prefix", func(args []string) (lines api.Filter, err error) {
+		return NewFilterRemovePrefix(args)
+	})
+}
+
+/////////////////////////////////////////////////
 // annotate filter
 /////////////////////////////////////////////////
 

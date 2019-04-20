@@ -52,8 +52,8 @@ func (g *GeoIPCityDecoder) decode(ip string, field string, doc map[string]interf
 		doc[fmt.Sprintf("%s.country_code", field)] = record.CountryCode
 		doc[fmt.Sprintf("%s.country_code3", field)] = record.CountryCode3
 		doc[fmt.Sprintf("%s.country_name", field)] = record.CountryName
-		doc[fmt.Sprintf("%s.continent_code", field)] = record.ContinentCode
 		doc[fmt.Sprintf("%s.region", field)] = record.Region
+		doc[fmt.Sprintf("%s.region_name", field)] = geoip.GetRegionName(record.Region, record.CountryCode)
 		doc[fmt.Sprintf("%s.city", field)] = record.City
 		doc[fmt.Sprintf("%s.postal_code", field)] = record.PostalCode
 		doc[fmt.Sprintf("%s.latitude", field)] = record.Latitude
