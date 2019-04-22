@@ -8,6 +8,7 @@ import (
 	"github.com/rapid7/godap/factory"
 	"github.com/rapid7/godap/util"
 	"os"
+	"strings"
 )
 
 func open_geoip_database(geoip_path string, default_database_files []string) (db *geoip.GeoIP, err error) {
@@ -113,6 +114,45 @@ func init() {
 
 		var decoder GeoIPDecoder
 		if decoder, err = NewGeoIPOrgDecoder(db); err != nil {
+			return nil, err
+		}
+
+		return NewFilterGeoIP(args, decoder)
+	})
+}
+
+type GeoIPASNDecoder struct {
+	GeoIPDecoder
+	db *geoip.GeoIP
+}
+
+func NewGeoIPASNDecoder(db *geoip.GeoIP) (decoder *GeoIPASNDecoder, err error) {
+	decoder = new(GeoIPASNDecoder)
+
+	if db == nil {
+		return nil, errors.New("A geoip database must be supplied.")
+	}
+	decoder.db = db
+	return
+}
+
+func (g *GeoIPASNDecoder) decode(ip string, field string, doc map[string]interface{}) {
+	if name, _ := g.db.GetName(ip); name != "" {
+		doc[fmt.Sprintf("%s.asn", field)] = strings.SplitN(name, " ", 1)[0]
+	}
+}
+
+func init() {
+	factory.RegisterFilter("geo_ip_asn", func(args []string) (filterGeoIPOrg api.Filter, err error) {
+		var db *geoip.GeoIP
+		if db, err = open_geoip_database(
+			util.GetEnv("GEOIP_ASN_DATABASE_PATH", "/var/lib/geoip"),
+			[]string{"GeoIPASNum.dat"}); err != nil {
+			return nil, err
+		}
+
+		var decoder GeoIPDecoder
+		if decoder, err = NewGeoIPASNDecoder(db); err != nil {
 			return nil, err
 		}
 
