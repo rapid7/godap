@@ -135,6 +135,12 @@ load ./test_common
   assert_output '{"line":"12.87.118.0","line.org":"AT&T Worldnet Services"}'
 }
 
+@test "geo_ip_asn" {
+  run bash -c "echo 12.87.118.0 | $DAP_EXECUTABLE lines + geo_ip_asn line + json | jq -Sc -r ."
+  assert_success
+  assert_output '{"line":"12.87.118.0","line.asn":"AS7018"}'
+}
+
 @test "geo_ip2_city yields valid fields" {
   run bash -c "echo 81.2.69.142 | GEOIP2_LANGUAGE=en GEOIP2_CITY_DATABASE_PATH=./test/test_data/geoip2/GeoIP2-City-Test.mmdb $DAP_EXECUTABLE lines + geo_ip2_city line + json | jq -Sc ."
   assert_success
