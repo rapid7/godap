@@ -136,9 +136,9 @@ load ./test_common
 }
 
 @test "geo_ip_asn" {
-  run bash -c "echo 12.87.118.0 | $DAP_EXECUTABLE lines + geo_ip_asn line + json | jq -Sc -r ."
+  run bash -c "echo 1.128.0.0 | GEOIP_ASN_DATABASE_PATH=./test/test_data/geoip/GeoIPASNum.dat $DAP_EXECUTABLE lines + geo_ip_asn line + json | jq -Sc -r ."
   assert_success
-  assert_output '{"line":"12.87.118.0","line.asn":"AS7018"}'
+  assert_output '{"line":"1.128.0.0","line.asn":"AS1221"}'
 }
 
 @test "geo_ip2_city yields valid fields" {

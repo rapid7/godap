@@ -138,7 +138,7 @@ func NewGeoIPASNDecoder(db *geoip.GeoIP) (decoder *GeoIPASNDecoder, err error) {
 
 func (g *GeoIPASNDecoder) decode(ip string, field string, doc map[string]interface{}) {
 	if name, _ := g.db.GetName(ip); name != "" {
-		doc[fmt.Sprintf("%s.asn", field)] = strings.SplitN(name, " ", 1)[0]
+		doc[fmt.Sprintf("%s.asn", field)] = strings.SplitN(name, " ", 2)[0]
 	}
 }
 
