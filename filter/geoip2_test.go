@@ -53,37 +53,38 @@ func TestGeoIP2CityDecoder(t *testing.T) {
 			decoder.decode(ip, "line", result)
 
 			Convey("The result should have expected geo_ip2 city fields", func() {
-				So(result, ShouldHaveLength, 30)
-				So(result["line.geoip2.city.geoname_id"], ShouldEqual, 2643743)
-				So(result["line.geoip2.city.name"], ShouldEqual, "London")
-				So(result["line.geoip2.continent.code"], ShouldEqual, "EU")
-				So(result["line.geoip2.continent.geoname_id"], ShouldEqual, 6255148)
-				So(result["line.geoip2.continent.name"], ShouldEqual, "Europe")
-				So(result["line.geoip2.country.geoname_id"], ShouldEqual, 2635167)
-				So(result["line.geoip2.country.is_eu"], ShouldBeTrue)
-				So(result["line.geoip2.country.iso_code"], ShouldEqual, "GB")
-				So(result["line.geoip2.country.name"], ShouldEqual, "United Kingdom")
-				So(result["line.geoip2.location.accuracy_raidus"], ShouldEqual, 10)
-				So(result["line.geoip2.location.latitude"], ShouldAlmostEqual, 51.5142)
-				So(result["line.geoip2.location.longitude"], ShouldAlmostEqual, -0.0931)
-				So(result["line.geoip2.location.metro_code"], ShouldEqual, 0)
-				So(result["line.geoip2.location.time_zone"], ShouldEqual, "Europe/London")
-				So(result["line.geoip2.postal.code"], ShouldBeEmpty)
-				So(result["line.geoip2.registered_country.geoname_id"], ShouldEqual, 6252001)
-				So(result["line.geoip2.registered_country.is_eu"], ShouldBeFalse)
-				So(result["line.geoip2.registered_country.iso_code"], ShouldEqual, "US")
-				So(result["line.geoip2.registered_country.name"], ShouldEqual, "United States")
-				So(result["line.geoip2.represented_country.geoname_id"], ShouldEqual, 0)
-				So(result["line.geoip2.represented_country.is_eu"], ShouldBeFalse)
-				So(result["line.geoip2.represented_country.iso_code"], ShouldBeEmpty)
-				So(result["line.geoip2.represented_country.name"], ShouldBeEmpty)
-				So(result["line.geoip2.represented_country.type"], ShouldBeEmpty)
-				So(result["line.geoip2.subdivisions.length"], ShouldEqual, 1)
-				So(result["line.geoip2.subdivisions.0.geoname_id"], ShouldEqual, 6269131)
-				So(result["line.geoip2.subdivisions.0.iso_code"], ShouldEqual, "ENG")
-				So(result["line.geoip2.subdivisions.0.name"], ShouldEqual, "England")
-				So(result["line.geoip2.traits.is_anon_proxy"], ShouldBeFalse)
-				So(result["line.geoip2.traits.is_satellite"], ShouldBeFalse)
+				So(result, ShouldResemble, map[string]interface{}{
+					"line.geoip2.city.geoname_id":                "2643743",
+					"line.geoip2.city.name":                      "London",
+					"line.geoip2.continent.code":                 "EU",
+					"line.geoip2.continent.geoname_id":           "6255148",
+					"line.geoip2.continent.name":                 "Europe",
+					"line.geoip2.country.geoname_id":             "2635167",
+					"line.geoip2.country.is_eu":                  "true",
+					"line.geoip2.country.iso_code":               "GB",
+					"line.geoip2.country.name":                   "United Kingdom",
+					"line.geoip2.location.accuracy_raidus":       "10",
+					"line.geoip2.location.latitude":              "51.5142",
+					"line.geoip2.location.longitude":             "-0.0931",
+					"line.geoip2.location.metro_code":            "0",
+					"line.geoip2.location.time_zone":             "Europe/London",
+					"line.geoip2.postal.code":                    "",
+					"line.geoip2.registered_country.geoname_id":  "6252001",
+					"line.geoip2.registered_country.is_eu":       "false",
+					"line.geoip2.registered_country.iso_code":    "US",
+					"line.geoip2.registered_country.name":        "United States",
+					"line.geoip2.represented_country.geoname_id": "0",
+					"line.geoip2.represented_country.is_eu":      "false",
+					"line.geoip2.represented_country.iso_code":   "",
+					"line.geoip2.represented_country.name":       "",
+					"line.geoip2.represented_country.type":       "",
+					"line.geoip2.subdivisions.0.geoname_id":      "6269131",
+					"line.geoip2.subdivisions.0.iso_code":        "ENG",
+					"line.geoip2.subdivisions.0.name":            "England",
+					"line.geoip2.subdivisions.length":            "1",
+					"line.geoip2.traits.is_anon_proxy":           "false",
+					"line.geoip2.traits.is_satellite":            "false",
+				})
 			})
 		})
 	})
@@ -101,7 +102,7 @@ func TestGeoIP2ISPDecoder(t *testing.T) {
 
 			Convey("The result should have expected geo_ip2 isp fields", func() {
 				So(result, ShouldHaveLength, 4)
-				So(result["line.geoip2.isp.asn"], ShouldEqual, 1221)
+				So(result["line.geoip2.isp.asn"], ShouldEqual, "1221")
 				So(result["line.geoip2.isp.asn_org"], ShouldEqual, "Telstra Pty Ltd")
 				So(result["line.geoip2.isp.isp"], ShouldEqual, "Telstra Internet")
 				So(result["line.geoip2.isp.org"], ShouldEqual, "Telstra Internet")

@@ -46,8 +46,10 @@ func (g *GeoIP2LegacyCompatDecoder) decode(ip string, field string, doc map[stri
 		doc[fmt.Sprintf("%s.country_name", field)] = v
 	}
 
-	if v, ok := doc[fmt.Sprintf("%s.geoip2.location.metro_code", field)]; ok && v.(uint) > 0 {
-		doc[fmt.Sprintf("%s.dma_code", field)] = v
+	if val_iface, ok := doc[fmt.Sprintf("%s.geoip2.location.metro_code", field)]; ok {
+		if val_str, ok := val_iface.(string); ok && val_str != "" && val_str != "0" {
+			doc[fmt.Sprintf("%s.dma_code", field)] = val_str
+		}
 	}
 
 	// No mapping for area code from geoip2
@@ -71,17 +73,19 @@ func (g *GeoIP2LegacyCompatDecoder) decode(ip string, field string, doc map[stri
 	}
 
 	if num_subdivisions_iface, ok := doc[fmt.Sprintf("%s.geoip2.subdivisions.length", field)]; ok {
-		if num_subdivisions, ok := num_subdivisions_iface.(int); ok {
-			// we don't really care to loop over the number of subdivisions.
-			// we only care that there's at least one, and if there is, we'll
-			// take the first one.
-			if num_subdivisions > 0 {
-				if v, ok := doc[fmt.Sprintf("%s.geoip2.subdivisions.0.iso_code", field)]; ok {
-					doc[fmt.Sprintf("%s.region", field)] = v
-				}
+		if num_subdivisions_str, ok := num_subdivisions_iface.(string); ok {
+			if num_subdivisions, err := strconv.ParseUint(num_subdivisions_str, 10, 64); err == nil {
+				// we don't really care to loop over the number of subdivisions.
+				// we only care that there's at least one, and if there is, we'll
+				// take the first one.
+				if num_subdivisions > 0 {
+					if v, ok := doc[fmt.Sprintf("%s.geoip2.subdivisions.0.iso_code", field)]; ok {
+						doc[fmt.Sprintf("%s.region", field)] = v
+					}
 
-				if v, ok := doc[fmt.Sprintf("%s.geoip2.subdivisions.0.name", field)]; ok {
-					doc[fmt.Sprintf("%s.region_name", field)] = v
+					if v, ok := doc[fmt.Sprintf("%s.geoip2.subdivisions.0.name", field)]; ok {
+						doc[fmt.Sprintf("%s.region_name", field)] = v
+					}
 				}
 			}
 		}
