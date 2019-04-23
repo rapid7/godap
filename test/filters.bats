@@ -126,7 +126,7 @@ load ./test_common
 @test "geo_ip yields valid fields" {
   run bash -c "echo 66.92.181.240 | GEOIP_CITY_DATABASE_PATH=./test/test_data/geoip/GeoIPCity.dat $DAP_EXECUTABLE lines + geo_ip line + json | jq -Sc ."
   assert_success
-  assert_output '{"line":"66.92.181.240","line.area_code":"510","line.city":"Fremont","line.country_code":"US","line.country_code3":"USA","line.country_name":"United States","line.dma_code":"807","line.latitude":"37.50790023803711","line.longitude":"-121.95999908447266","line.postal_code":"94538","line.region":"CA","line.region_name":""}'
+  assert_output '{"line":"66.92.181.240","line.area_code":"510","line.city":"Fremont","line.country_code":"US","line.country_code3":"USA","line.country_name":"United States","line.dma_code":"807","line.latitude":"37.50790023803711","line.longitude":"-121.95999908447266","line.postal_code":"94538","line.region":"CA","line.region_name":"California"}'
 }
 
 @test "geo_ip_org yields valid fields" {
