@@ -8,6 +8,7 @@ import (
 	"github.com/rapid7/godap/factory"
 	"github.com/rapid7/godap/util"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -57,10 +58,10 @@ func (g *GeoIPCityDecoder) decode(ip string, field string, doc map[string]interf
 		doc[fmt.Sprintf("%s.region_name", field)] = geoip.GetRegionName(record.Region, record.CountryCode)
 		doc[fmt.Sprintf("%s.city", field)] = record.City
 		doc[fmt.Sprintf("%s.postal_code", field)] = record.PostalCode
-		doc[fmt.Sprintf("%s.latitude", field)] = record.Latitude
-		doc[fmt.Sprintf("%s.longitude", field)] = record.Longitude
-		doc[fmt.Sprintf("%s.dma_code", field)] = record.MetroCode
-		doc[fmt.Sprintf("%s.area_code", field)] = record.AreaCode
+		doc[fmt.Sprintf("%s.latitude", field)] = strconv.FormatFloat(float64(record.Latitude), 'f', -1, 64)
+		doc[fmt.Sprintf("%s.longitude", field)] = strconv.FormatFloat(float64(record.Longitude), 'f', -1, 64)
+		doc[fmt.Sprintf("%s.dma_code", field)] = strconv.Itoa(record.MetroCode)
+		doc[fmt.Sprintf("%s.area_code", field)] = strconv.Itoa(record.AreaCode)
 	}
 }
 

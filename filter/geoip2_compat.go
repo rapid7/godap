@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/rapid7/godap/api"
 	"github.com/rapid7/godap/factory"
+	"strconv"
 )
 
 type GeoIP2LegacyCompatDecoder struct {
@@ -13,6 +14,29 @@ type GeoIP2LegacyCompatDecoder struct {
 func (g *GeoIP2LegacyCompatDecoder) decode(ip string, field string, doc map[string]interface{}) {
 	if v, ok := doc[fmt.Sprintf("%s.geoip2.country.iso_code", field)]; ok {
 		doc[fmt.Sprintf("%s.country_code", field)] = v
+	}
+	// According to https://dev.maxmind.com/geoip/geoip2/whats-new-in-geoip2/#Custom_Country_Codes,
+	// "For IP addresses where we used A1 or A2, we now set the appropriate key in the traits object.
+	// The A1 code corresponds to the is_anonymous_proxy key, while A2 corresponds to is_satellite_provider."
+	//
+	// The country code field in geoip legacy was overridden in cases to denote whether an IP is an
+	// anon proxy, or if it is a satellite provider. In geoip2, maxmind separated the proxy/satellite
+	// demarcation into a separate 'traits' field.
+	//
+	// Thus, for compatibility reasons, we will set country_code appropriately if either is_anonymous_proxy
+	// or is_satellite_provider are set.
+	if is_anon_proxy_iface, ok := doc[fmt.Sprintf("%s.geoip2.traits.is_anon_proxy", field)]; ok {
+		if is_anon_proxy_str, ok := is_anon_proxy_iface.(string); ok {
+			if val, err := strconv.ParseBool(is_anon_proxy_str); val && err == nil {
+				doc[fmt.Sprintf("%s.country_code", field)] = "A1"
+			}
+		}
+	} else if is_satellite_iface, ok := doc[fmt.Sprintf("%s.geoip2.traits.is_satellite", field)]; ok {
+		if is_satellite_str, ok := is_satellite_iface.(string); ok {
+			if val, err := strconv.ParseBool(is_satellite_str); val && err == nil {
+				doc[fmt.Sprintf("%s.country_code", field)] = "A2"
+			}
+		}
 	}
 
 	// No mapping for country_code3 from geoip2

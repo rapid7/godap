@@ -45,10 +45,10 @@ func TestGeoIPCityDecoder(t *testing.T) {
 					"line.region_name":   "",
 					"line.city":          "Fremont",
 					"line.postal_code":   "94538",
-					"line.latitude":      float32(37.5079),
-					"line.longitude":     float32(-121.96),
-					"line.dma_code":      807,
-					"line.area_code":     510,
+					"line.latitude":      "37.50790023803711",
+					"line.longitude":     "-121.95999908447266",
+					"line.dma_code":      "807",
+					"line.area_code":     "510",
 				})
 			})
 		})
@@ -87,10 +87,10 @@ func TestGeoIPCityFilterFactoryIntegration(t *testing.T) {
 					"line.region_name":   "",
 					"line.city":          "Fremont",
 					"line.postal_code":   "94538",
-					"line.latitude":      float32(37.5079),
-					"line.longitude":     float32(-121.96),
-					"line.dma_code":      807,
-					"line.area_code":     510,
+					"line.latitude":      "37.50790023803711",
+					"line.longitude":     "-121.95999908447266",
+					"line.dma_code":      "807",
+					"line.area_code":     "510",
 				})
 			})
 
@@ -175,10 +175,81 @@ func TestGeoIPOrgFilterFactoryIntegration(t *testing.T) {
 		os.Setenv("GEOIP_ORG_DATABASE_PATH", "/does/not/exist")
 		defer os.Unsetenv("GEOIP_ORG_DATABASE_PATH")
 
-		Convey("When a geo_ip (city) filter is created", func() {
+		Convey("When a geo_ip_org filter is created", func() {
 			filterGeoIPOrg, err := factory.CreateFilter([]string{"geo_ip_org", "line"})
 
-			Convey("The geo_ip filter should be nil", func() {
+			Convey("The geo_ip_org filter should be nil", func() {
+				So(filterGeoIPOrg, ShouldBeNil)
+			})
+
+			Convey("The error should indicate the directory does not exist", func() {
+				So(os.IsNotExist(err), ShouldBeTrue)
+			})
+		})
+	})
+}
+
+func TestGeoIPASNDecoder(t *testing.T) {
+	Convey("Given an input ip address and geoip asn database", t, func() {
+		ip := "1.128.0.0" // test address in the GeoIPOrg.dat test database
+		db, _ := open_geoip_database("../test/test_data/geoip/GeoIPASNum.dat", []string{})
+		decoder, _ := NewGeoIPASNDecoder(db)
+
+		Convey("When the IP is processed by the decoder", func() {
+			result := make(map[string]interface{})
+			decoder.decode(ip, "line", result)
+
+			Convey("The result should have the expected `asn` field", func() {
+				So(result, ShouldResemble, map[string]interface{}{
+					"line.asn": "AS1221",
+				})
+			})
+		})
+	})
+}
+
+func TestGeoIPASNFilterFactoryIntegration(t *testing.T) {
+	Convey("When a geo_ip_asn filter is created through the factory", t, func() {
+		os.Setenv("GEOIP_ASN_DATABASE_PATH", "../test/test_data/geoip/GeoIPASNum.dat")
+		defer os.Unsetenv("GEOIP_ASN_DATABASE_PATH")
+		filterGeoIPASN, err := factory.CreateFilter([]string{"geo_ip_asn", "line"})
+
+		Convey("The geo_ip_asn filter should not be nil", func() {
+			So(filterGeoIPASN, ShouldNotBeNil)
+		})
+
+		Convey("The error should not be set (nil)", func() {
+			So(err, ShouldBeNil)
+		})
+		Convey("When the input is passed to the filter", func() {
+			in_doc := map[string]interface{}{"line": "1.128.0.0"}
+			result, err := filterGeoIPASN.Process(in_doc)
+
+			Convey("The result contains only one document", func() {
+				So(result, ShouldHaveLength, 1)
+			})
+
+			Convey("The first item in the result should have expected geo_ip_org fields", func() {
+				So(result[0], ShouldResemble, map[string]interface{}{
+					"line":     "1.128.0.0",
+					"line.asn": "AS1221",
+				})
+			})
+
+			Convey("The error should not be set", func() {
+				So(err, ShouldBeNil)
+			})
+		})
+	})
+
+	Convey("Given the GEOIP_ASN_DATABASE_PATH set to an invalid path", t, func() {
+		os.Setenv("GEOIP_ASN_DATABASE_PATH", "/does/not/exist")
+		defer os.Unsetenv("GEOIP_ASN_DATABASE_PATH")
+
+		Convey("When a geo_ip_asn filter is created", func() {
+			filterGeoIPOrg, err := factory.CreateFilter([]string{"geo_ip_org", "line"})
+
+			Convey("The geo_ip_asn filter should be nil", func() {
 				So(filterGeoIPOrg, ShouldBeNil)
 			})
 
